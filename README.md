@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -14,25 +15,24 @@
   }
 
   *{box-sizing:border-box;}
-
   body{
     margin:0; color:var(--fg);
-    background: var(--bg);
+    background: var(--bg); /* solid background (no animated layers) */
     font:15px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    transition: background .4s ease;
   }
 
   /* Utilities */
   .mb-6{ margin-bottom:6px; }
   .mt-8{ margin-top:8px; }
+  .hide{ display:none !important; }
 
   /* Centered, compact container */
-  .container{ max-width:900px; margin:14px auto 36px; padding:0 12px; }
+  .container{ position:relative; max-width:900px; margin:14px auto 36px; padding:0 12px; }
   header{padding:0 0 8px;}
   h1{font-size:18px; margin:0 0 4px;}
   .subtitle{color:var(--muted); font-size:12px; margin:0 0 8px;}
 
-  .wrap{ display:flex; flex-direction:column; gap:10px; }
+  .wrap{ position:relative; z-index:1; display:flex; flex-direction:column; gap:10px; }
 
   .card{
     background:var(--card);
@@ -41,7 +41,7 @@
     border:1px solid var(--border);
   }
 
-  /* Glow overlay inside cards */
+  /* Optional in-card glow (kept on log) */
   .card.glow{ position:relative; overflow:hidden; background:var(--card); }
   .card.glow::before{
     content:"";
@@ -64,6 +64,7 @@
   .btn.primary{background:var(--accent); border-color:transparent;}
   .btn.danger{background:#a22; border-color:transparent;}
   .btn.ghost{background:transparent;}
+  .btn.toggled{ background: var(--accent); border-color: transparent; }
 
   .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#223; color:#cde; font-size:12px; margin-left:6px;}
   .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
@@ -74,7 +75,16 @@
   .log{max-height:34vh; overflow:auto; padding-right:6px;}
   .log div{overflow-wrap:anywhere; word-break:break-word; font-size:13px;}
 
-  /* Animated progress bar (custom meter) */
+  /* Divider in log */
+  .divider{
+    display:flex; align-items:center; gap:8px; color:#cde; margin:8px 0; font-weight:700;
+  }
+  .divider::before, .divider::after{
+    content:""; flex:1; height:1px; background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity:.45;
+  }
+
+  /* Animated progress bar */
   .meter{width:100%; height:12px; background:#2a2f44; border-radius:8px; overflow:hidden;}
   .meter .fill{height:100%; width:0%; background:var(--accent); transition:width .35s linear;}
 
@@ -86,17 +96,31 @@
   }
   .phase-flash{ animation:phaseFlash .9s ease; }
 
-  /* Keep top controls sticky but within centered column */
+  /* Sticky top controls */
   .sticky{ position:sticky; top:0; z-index:5; box-shadow:0 6px 16px rgba(0,0,0,.25); }
 
-  @media (max-width:380px){
-    .taskline{font-size:14px;}
-    .btn{font-size:13px;}
+  /* End summary modal */
+  .overlay{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+    background: rgba(0,0,0,.55); z-index:20;
+  }
+  .overlay.show{ display:flex; }
+  .summary{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; width:min(680px, calc(100% - 32px));
+    box-shadow:0 14px 40px rgba(0,0,0,.4);
+  }
+  .summary h2{ margin:0 0 8px; font-size:18px; }
+  .summary .grid{ grid-template-columns:1fr 1fr; gap:10px; }
+  .summary .stat{ background:#151925; border:1px solid #222a3a; border-radius:10px; padding:10px; }
+  .summary .actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+
+  @media (max-width:520px){
+    .summary .grid{ grid-template-columns:1fr; }
   }
 </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="container">
     <header>
       <h1>Session Controller <span id="modeTag" class="pill">Princess Mode</span></h1>
       <p class="subtitle">Warm-up → Build-up → Cruel Overload → Final Reset → Finish</p>
@@ -111,13 +135,19 @@
           <button id="shortBtn" class="btn" aria-pressed="false">Short</button>
           <button id="longBtn" class="btn primary" aria-pressed="true">Long</button>
         </div>
-        <!-- Row 2: transport controls -->
+
+        <!-- Row 2: transport controls + Sound toggle -->
         <div class="row">
           <button id="startBtn" class="btn ghost" title="S">Start</button>
           <button id="pauseBtn" class="btn" title="Space">Pause</button>
           <button id="skipBtn" class="btn ghost" title="K">Skip</button>
           <button id="finishBtn" class="btn danger" title="F">Finish Now</button>
+
+          <button id="soundBtn" class="btn ghost" aria-pressed="false" title="Toggle sound">
+            🔇 Sound Off
+          </button>
         </div>
+
         <div class="tiny mt-8">
           Open from Files → Share → <b>Open in Safari</b>. Rests occur occasionally; timers run while Safari is foregrounded.
         </div>
@@ -146,24 +176,60 @@
     </div>
   </div>
 
+  <!-- End Summary -->
+  <div class="overlay" id="overlay">
+    <div class="summary">
+      <h2>Session Summary <span class="pill" id="summaryMode">—</span></h2>
+      <div class="grid">
+        <div class="stat"><div class="label">Total Duration</div><div id="sumDuration" class="taskline">—</div></div>
+        <div class="stat"><div class="label">Steps Completed</div><div id="sumSteps" class="taskline">—</div></div>
+        <div class="stat"><div class="label">Rests</div><div id="sumRests" class="taskline">—</div></div>
+        <div class="stat"><div class="label">Skips</div><div id="sumSkips" class="taskline">—</div></div>
+        <div class="stat"><div class="label">Finisher</div><div id="sumFinisher" class="taskline">—</div></div>
+        <div class="stat"><div class="label">Start → End</div><div id="sumTimes" class="taskline">—</div></div>
+      </div>
+      <div class="actions">
+        <button id="saveLogBtn" class="btn ghost">Save Log (.txt)</button>
+        <button id="restartBtn" class="btn">Restart Session</button>
+        <button id="closeSummaryBtn" class="btn primary">Close</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 /* ================== STATE ================== */
-const LS_KEYS = { MODE:'sc_mode', LENGTH:'sc_length' };
+const LS_KEYS = { MODE:'sc_mode', LENGTH:'sc_length', SOUND:'sc_sound' };
 let MODE   = localStorage.getItem(LS_KEYS.MODE)   || "PRINCESS";
 let LENGTH = localStorage.getItem(LS_KEYS.LENGTH) || "LONG";
+let SOUND  = localStorage.getItem(LS_KEYS.SOUND)  === "1";
 
 /* ================== DOM SHORTCUTS ================== */
 const $ = s => document.querySelector(s);
 const els = {
+  overlay: $("#overlay"),
+  summaryMode: $("#summaryMode"),
+  sumDuration: $("#sumDuration"),
+  sumSteps: $("#sumSteps"),
+  sumRests: $("#sumRests"),
+  sumSkips: $("#sumSkips"),
+  sumFinisher: $("#sumFinisher"),
+  sumTimes: $("#sumTimes"),
+  saveLogBtn: $("#saveLogBtn"),
+  restartBtn: $("#restartBtn"),
+  closeSummaryBtn: $("#closeSummaryBtn"),
+
   modeTag: $("#modeTag"),
   domBtn: $("#domBtn"),
   princessBtn: $("#princessBtn"),
   shortBtn: $("#shortBtn"),
   longBtn: $("#longBtn"),
+
   startBtn: $("#startBtn"),
   pauseBtn: $("#pauseBtn"),
   skipBtn: $("#skipBtn"),
   finishBtn: $("#finishBtn"),
+  soundBtn: $("#soundBtn"),
+
   phaseCard: $("#phaseCard"),
   phase: $("#phase"),
   task: $("#task"),
@@ -173,15 +239,26 @@ const els = {
   log: $("#log"),
 };
 
-/* ================== LOGGING ================== */
+/* ================== LOGGING WITH ICONS ================== */
+const ICONS = {
+  info: "📝", phase: "🧭", task: "🎯", rest:"🌙", skip:"⏭️", pause:"⏸️", resume:"▶️", finisher:"🏁"
+};
 function ts(){
   const d=new Date();
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
 }
-function log(msg){
+function log(msg, kind="info"){
   const line = document.createElement('div');
-  line.textContent = `[${ts()}] ${msg}`;
+  const icon = ICONS[kind] || ICONS.info;
+  line.textContent = `${icon} [${ts()}] ${msg}`;
   els.log.appendChild(line);
+  els.log.scrollTop = els.log.scrollHeight;
+}
+function addDivider(label){
+  const div = document.createElement('div');
+  div.className = 'divider';
+  div.innerHTML = `<span>🧭 ${label}</span>`;
+  els.log.appendChild(div);
   els.log.scrollTop = els.log.scrollHeight;
 }
 
@@ -366,7 +443,7 @@ function buildPrincessPlan(){
     plan.push({phase:"Build-up", kind:`Build ${i+1}`, text:choiceLimitedFrom("P_BUILD", P_BUILD), dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) plan.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
-  for(let i=0;i+t.overRounds;i++){
+  for(let i=0;i<t.overRounds;i++){
     const d = randInt(...t.overSpan);
     plan.push({phase:"Cruel Overload", kind:`Overload ${i+1}`, text:choiceLimitedFrom("P_OVER", P_OVER), dur:d});
     const r=maybeRest(t.restOver,t.restProb); if(r) plan.push({phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r});
@@ -375,9 +452,32 @@ function buildPrincessPlan(){
   return {plan, finisherPool:P_FINISH};
 }
 
-/* ================== PLAYER (drift-resistant + animations) ================== */
+/* ================== PLAYER ================== */
 let plan=[], finisherPool=[], current=0, remain=0, totalRemain=0;
 let ticking=false, lastTs=0, intervalId=null;
+let sessionStart=null, sessionEnd=null, completedSteps=0, restCount=0, skipCount=0, finisherUsed="—";
+let prevPhase="";
+
+/* SOUND via WebAudio (no external files) */
+let audioCtx=null;
+function playChime(){
+  if(!SOUND) return;
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.value = 880;   // A5
+    g.gain.value = 0.0001;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    const now = audioCtx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.12, now + 0.02);
+    o.frequency.exponentialRampToValueAtTime(1320, now + 0.12); // upward ping
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.20);
+    o.stop(now + 0.22);
+  }catch(e){}
+}
 
 function computeTotalRemain(fromIndex=0){
   return plan.slice(fromIndex).reduce((a,b)=>a+b.dur,0);
@@ -385,13 +485,14 @@ function computeTotalRemain(fromIndex=0){
 
 function start(){
   resetChooser();
-  current=0;
+  current=0; completedSteps=0; restCount=0; skipCount=0; finisherUsed="—"; prevPhase="";
   const r = (MODE==="DOM") ? buildDomPlan() : buildPrincessPlan();
   plan=r.plan; finisherPool=r.finisherPool;
   remain = plan[0]?.dur || 0;
   totalRemain = computeTotalRemain(0);
+  sessionStart = new Date(); sessionEnd = null;
   render(true);
-  log(`Session started (${MODE}, ${LENGTH})`);
+  log(`Session started (${MODE}, ${LENGTH})`,"info");
   startTicking();
 }
 
@@ -419,16 +520,20 @@ function flashPhase(){
 function step(elapsedSec){
   remain -= elapsedSec;
   if(remain <= 0){
+    completedSteps++;
     current++;
     if(current >= plan.length){
       const f = choice(finisherPool);
+      finisherUsed = f;
       els.phase.textContent = "Finisher";
       els.task.textContent = f;
-      log("Finisher: "+f);
+      log("Finisher: "+f,"finisher");
       stopTicking();
       els.meterFill.style.width = "0%";
       els.clock.textContent = "00:00";
       els.eta.textContent = "~00:00 left";
+      sessionEnd = new Date();
+      openSummary();
       return;
     }
     remain = plan[current].dur + Math.max(0, -remain);
@@ -439,9 +544,24 @@ function step(elapsedSec){
 function render(initial=false){
   const step = plan[current];
   if(!step) return;
+
+  // Phase divider + sound on phase change (and each new step)
+  if(step.phase !== prevPhase){
+    addDivider(step.phase);
+    playChime();
+    prevPhase = step.phase;
+  } else {
+    playChime();
+  }
+
   els.phase.textContent = step.phase;
   els.task.textContent = (step.kind?step.kind+": ":"") + step.text;
-  if(initial) log(`${step.phase} → ${step.text} (${step.dur}s)`);
+
+  if(step.kind === "Rest") restCount++;
+
+  if(initial) log(`${step.phase} → ${step.text} (${step.dur}s)`,"task");
+  else log(`${step.kind?step.kind+": ":""}${step.text} (${step.dur}s)`,"task");
+
   flashPhase();
   updateMeterAndTimes();
 }
@@ -455,17 +575,20 @@ function updateMeterAndTimes(){
   els.eta.textContent = "~"+mmss(Math.ceil(totalRemain))+" left";
 }
 
-function pause(){ if(ticking){ stopTicking(); log("Paused"); } else { startTicking(); log("Resumed"); } }
-function skip(){ if(!plan[current]) return; log(`Skipped: ${(plan[current].kind?plan[current].kind+": ":"")}${plan[current].text}`); remain = 0.0001; }
+function pause(){ if(ticking){ stopTicking(); log("Paused","pause"); } else { startTicking(); log("Resumed","resume"); } }
+function skip(){ if(!plan[current]) return; log(`Skipped: ${(plan[current].kind?plan[current].kind+": ":"")}${plan[current].text}`,"skip"); skipCount++; remain = 0.0001; }
 function finishNow(){
   stopTicking();
   const f = choice(finisherPool);
+  finisherUsed = f;
   els.phase.textContent = "Finisher";
   els.task.textContent = f;
-  log("Finisher (manual): "+f);
+  log("Finisher (manual): "+f,"finisher");
   els.meterFill.style.width = "0%";
   els.clock.textContent = "00:00";
   els.eta.textContent = "~00:00 left";
+  sessionEnd = new Date();
+  openSummary();
 }
 
 /* ================== CONTROLS, PREFS, MODE TINT ================== */
@@ -492,6 +615,19 @@ function applyLengthButtons(){
   setPrimary(els.longBtn, LENGTH==="LONG");
   localStorage.setItem(LS_KEYS.LENGTH, LENGTH);
 }
+function applySoundButton(){
+  els.soundBtn.classList.toggle("toggled", SOUND);
+  els.soundBtn.setAttribute("aria-pressed", SOUND ? "true" : "false");
+  els.soundBtn.textContent = SOUND ? "🔊 Sound On" : "🔇 Sound Off";
+  localStorage.setItem(LS_KEYS.SOUND, SOUND ? "1" : "0");
+}
+
+/* Sound toggle button */
+els.soundBtn.addEventListener("click", ()=>{
+  SOUND = !SOUND;
+  applySoundButton();
+  log("Sound " + (SOUND ? "enabled" : "disabled"));
+});
 
 els.domBtn.addEventListener("click", ()=>{ MODE="DOM"; applyModeButtons(); log("Dom Mode selected"); });
 els.princessBtn.addEventListener("click", ()=>{ MODE="PRINCESS"; applyModeButtons(); log("Princess Mode selected"); });
@@ -514,9 +650,41 @@ window.addEventListener("keydown", (e)=>{
   else if(e.key.toLowerCase() === "l"){ LENGTH = (LENGTH==="LONG"?"SHORT":"LONG"); applyLengthButtons(); log(`Length → ${LENGTH}`); }
 });
 
-/* Initial UI sync */
+/* ================== SUMMARY & SAVE LOG ================== */
+function openSummary(){
+  const totalSecs = plan.reduce((a,b)=>a+b.dur,0);
+  const startStr = sessionStart ? sessionStart.toLocaleTimeString() : "—";
+  const endStr   = sessionEnd ? sessionEnd.toLocaleTimeString() : "—";
+  els.summaryMode.textContent = MODE === "DOM" ? "Dom Mode" : "Princess Mode";
+  els.sumDuration.textContent = mmss(Math.round(totalSecs));
+  els.sumSteps.textContent = String(completedSteps);
+  els.sumRests.textContent = String(restCount);
+  els.sumSkips.textContent = String(skipCount);
+  els.sumFinisher.textContent = finisherUsed || "—";
+  els.sumTimes.textContent = `${startStr} → ${endStr}`;
+
+  els.overlay.classList.add("show");
+}
+function closeSummary(){ els.overlay.classList.remove("show"); }
+function saveLog(){
+  const lines = Array.from(els.log.children).map(n => n.textContent);
+  const text = lines.join("\n");
+  const blob = new Blob([text], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const day = new Date();
+  const filename = `Session_Log_${day.getFullYear()}-${String(day.getMonth()+1).padStart(2,'0')}-${String(day.getDate()).padStart(2,'0')}.txt`;
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+els.saveLogBtn.addEventListener("click", saveLog);
+els.restartBtn.addEventListener("click", ()=>{ closeSummary(); start(); });
+els.closeSummaryBtn.addEventListener("click", closeSummary);
+
+/* ================== INIT ================== */
 applyModeButtons();
 applyLengthButtons();
+applySoundButton();
 els.phase.textContent = "—";
 els.task.textContent = "Ready when you are.";
 els.clock.textContent = "00:00";
