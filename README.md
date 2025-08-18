@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -146,10 +145,6 @@
           <button id="soundBtn" class="btn ghost" aria-pressed="false" title="Toggle sound">
             🔇 Sound Off
           </button>
-        </div>
-
-        <div class="tiny mt-8">
-          Open from Files → Share → <b>Open in Safari</b>. Rests occur occasionally; timers run while Safari is foregrounded.
         </div>
       </div>
 
