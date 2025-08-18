@@ -16,7 +16,7 @@
   *{box-sizing:border-box;}
   body{
     margin:0; color:var(--fg);
-    background: var(--bg); /* solid background (no animated layers) */
+    background: var(--bg); /* solid background */
     font:15px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
   }
 
@@ -116,10 +116,49 @@
   @media (max-width:520px){
     .summary .grid{ grid-template-columns:1fr; }
   }
+
+  /* ——— Easter Egg visuals ——— */
+  .ribbon{
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 35%, #000), var(--accent));
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 8px 24px rgba(0,0,0,.35), 0 0 24px color-mix(in srgb, var(--accent) 25%, transparent);
+    font-weight: 700;
+    letter-spacing: .2px;
+    z-index: 50;
+    opacity: 0;
+    transition: transform .35s ease, opacity .35s ease;
+    pointer-events: none;
+  }
+  .ribbon.show{
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .ribbon span{ font-size: 13px; }
+
+  .confetti{
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
   <div class="container" id="container">
+
+    <!-- Easter egg UI (hidden until triggered) -->
+    <div id="secretRibbon" class="ribbon hide" aria-hidden="true">
+      <span>Made for Princess</span>
+    </div>
+    <canvas id="confetti" class="confetti hide" aria-hidden="true"></canvas>
+
     <header>
       <h1>Session Controller <span id="modeTag" class="pill">Princess Mode</span></h1>
       <p class="subtitle">Warm-up → Build-up → Cruel Overload → Final Reset → Finish</p>
@@ -318,14 +357,14 @@ const P_BUILD = [
 const P_OVER = [
   "Thrash Assault — sucky level 8 tapping clit",
   "Relentless Suck-Lock — sucky level 7 sealed on her clit",
-  "Pinned Spread — two fingers fucking her fast, while vibrator level 6 grinds on clit",
-  "Tongue Torture — mouth suction sealed on clit, fast tongue flicks, while fingering",
+  "Pinned Spread — two fingers fast, while vibrator level 6 grinds on clit",
+  "Tongue Torture — mouth suction on clit, fast tongue flicks, while fingering",
   "Rolling Edge — sucky level 8, drop to 5 then back to 8, repeating",
   "Edge Trap — rub her G-spot with 2 fingers while sucky level 7 stays on clit",
-  "Breaking Point — vibrator level 8 pressed to clit + your full hand squeezing her lips"
+  "Breaking Point — vibrator level 8 pressed to clit + full hand squeezing her lips"
 ];
 const P_FINISH = [
-  "Clit Clamp — sucky level 8 pinned to clit until she explodes",
+  "Clit Clamp — sucky level 8 pinned to clit",
   "Double Pressure — two fingers curl hard on G-spot + sucky level 8 on clit",
   "Grinding Lock — vibrator laid flat and ground firmly into clit",
   "Pulse & Trap — sucky level 8 in bursts while fingering",
@@ -675,6 +714,103 @@ function saveLog(){
 els.saveLogBtn.addEventListener("click", saveLog);
 els.restartBtn.addEventListener("click", ()=>{ closeSummary(); start(); });
 els.closeSummaryBtn.addEventListener("click", closeSummary);
+
+/* ================== EASTER EGG (Princess button triple-click) ================== */
+let secretClicks = 0;
+let secretTimer = null;
+
+// visuals refs
+const ribbonEl = document.getElementById("secretRibbon");
+const confettiCanvas = document.getElementById("confetti");
+const ctxConf = confettiCanvas.getContext("2d");
+
+function resizeConfetti(){
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+
+function showRibbon(ms=2400){
+  ribbonEl.classList.remove("hide");
+  void ribbonEl.offsetWidth;                // reflow
+  ribbonEl.classList.add("show");
+  setTimeout(()=>{
+    ribbonEl.classList.remove("show");
+    setTimeout(()=> ribbonEl.classList.add("hide"), 300);
+  }, ms);
+}
+
+function heartConfettiBurst(durationMs = 1600, count = 54){
+  confettiCanvas.classList.remove("hide");
+  const W = confettiCanvas.width, H = confettiCanvas.height;
+  const hearts = Array.from({length:count}).map(()=>({
+    x: Math.random()*W,
+    y: -20 - Math.random()*H*0.2,
+    s: 8 + Math.random()*10,
+    vx: (Math.random()-0.5)*0.6,
+    vy: 1.2 + Math.random()*1.8,
+    rot: Math.random()*Math.PI*2,
+    vr: (Math.random()-0.5)*0.1,
+    a: 0.8 + Math.random()*0.2
+  }));
+
+  let start = null, raf;
+
+  function drawHeart(x, y, s, rot, color){
+    ctxConf.save();
+    ctxConf.translate(x,y);
+    ctxConf.rotate(rot);
+    ctxConf.scale(s/16, s/16);
+    ctxConf.beginPath();
+    for(let t=0; t<Math.PI*2; t+=0.1){
+      const px = 16 * Math.pow(Math.sin(t),3);
+      const py = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+      if(t===0) ctxConf.moveTo(px, -py); else ctxConf.lineTo(px, -py);
+    }
+    ctxConf.closePath();
+    ctxConf.fillStyle = color;
+    ctxConf.fill();
+    ctxConf.restore();
+  }
+
+  function frame(ts){
+    if(!start) start = ts;
+    const elapsed = ts - start;
+    ctxConf.clearRect(0,0,W,H);
+    const c = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e66';
+    hearts.forEach(h=>{
+      h.x += h.vx; h.y += h.vy; h.rot += h.vr;
+      ctxConf.globalAlpha = Math.max(0, h.a * (1 - elapsed/durationMs));
+      drawHeart(h.x, h.y, h.s, h.rot, c);
+    });
+    ctxConf.globalAlpha = 1;
+    if(elapsed < durationMs) raf = requestAnimationFrame(frame);
+    else {
+      ctxConf.clearRect(0,0,W,H);
+      confettiCanvas.classList.add("hide");
+      cancelAnimationFrame(raf);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function triggerEasterEgg(){
+  playChime?.();        // use your chime if sound is on
+  showRibbon();         // ribbon drop
+  heartConfettiBurst(); // hearts
+}
+
+// Triple-click detection on the Princess Mode button
+els.princessBtn.addEventListener("click", ()=>{
+  secretClicks++;
+  clearTimeout(secretTimer);
+  secretTimer = setTimeout(()=>{ secretClicks = 0; }, 600); // 600ms window
+  if(secretClicks >= 3){
+    secretClicks = 0;
+    triggerEasterEgg();
+  }
+});
 
 /* ================== INIT ================== */
 applyModeButtons();
