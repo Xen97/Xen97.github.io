@@ -3,11 +3,6 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>Session Controller (Dom / Princess)</title>
-
-<!-- Optional iOS niceties (safe, minimal) -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <style>
   :root{
     --bg:#0f1115; --fg:#e6e6e6; --muted:#aab;
@@ -103,24 +98,6 @@
   /* Sticky top controls */
   .sticky{ position:sticky; top:0; z-index:5; box-shadow:0 6px 16px rgba(0,0,0,.25); }
 
-  /* Fullscreen tweaks */
-  :fullscreen .container,
-  :-webkit-full-screen .container{
-    max-width:100vw; padding:8px;
-  }
-  :fullscreen body,
-  :-webkit-full-screen body{
-    background:var(--bg);
-  }
-  /* Respect notches/safe areas while fullscreen */
-  :fullscreen .container,
-  :-webkit-full-screen .container{
-    padding-left: max(8px, env(safe-area-inset-left));
-    padding-right: max(8px, env(safe-area-inset-right));
-    padding-top: max(8px, env(safe-area-inset-top));
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
-
   /* End summary modal */
   .overlay{
     position:fixed; inset:0; display:none; align-items:center; justify-content:center;
@@ -158,15 +135,16 @@
           <button id="longBtn" class="btn primary" aria-pressed="true">Long</button>
         </div>
 
-        <!-- Row 2: transport controls + Sound + Fullscreen -->
+        <!-- Row 2: transport controls + Sound toggle -->
         <div class="row">
           <button id="startBtn" class="btn ghost" title="S">Start</button>
           <button id="pauseBtn" class="btn" title="Space">Pause</button>
           <button id="skipBtn" class="btn ghost" title="K">Skip</button>
           <button id="finishBtn" class="btn danger" title="F">Finish Now</button>
 
-          <button id="soundBtn" class="btn ghost" aria-pressed="false" title="Toggle sound">🔇 Sound Off</button>
-          <button id="fsBtn" class="btn ghost" aria-pressed="false" title="Fullscreen">⛶ Fullscreen</button>
+          <button id="soundBtn" class="btn ghost" aria-pressed="false" title="Toggle sound">
+            🔇 Sound Off
+          </button>
         </div>
       </div>
 
@@ -246,7 +224,6 @@ const els = {
   skipBtn: $("#skipBtn"),
   finishBtn: $("#finishBtn"),
   soundBtn: $("#soundBtn"),
-  fsBtn: $("#fsBtn"),
 
   phaseCard: $("#phaseCard"),
   phase: $("#phase"),
@@ -434,7 +411,7 @@ function buildDomPlan(){
     plan.push({phase:"Mid Build-up", kind:`Stroking ${i+1}`, text:choiceLimitedFrom("D_MID_STROKE", D_MID_STROKE), dur:d});
     const r2=maybeRest(t.restWB,t.restProb); if(r2) plan.push({phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
   }
-  for(let i=0;i+t.overRounds;i++){
+  for(let i=0;i<t.overRounds;i++){
     const pd=randInt(...t.overPalm);
     const palmingPool = D_OVER_PALM.concat(D_OVER_PALM);
     plan.push({phase:"Cruel Overload", kind:`Overload Palming ${i+1}`, text:choiceLimitedFrom("D_OVER_PALM", palmingPool), dur:pd});
@@ -456,7 +433,7 @@ function buildPrincessPlan(){
     plan.push({phase:"Warm-up", kind:`Warm ${i+1}`, text:choiceLimitedFrom("P_WARM", P_WARM), dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) plan.push({phase:"Warm-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
-  for(let i=0;i+t.buildCycles;i++){
+  for(let i=0;i<t.buildCycles;i++){
     const d = randInt(...t.buildSpan);
     plan.push({phase:"Build-up", kind:`Build ${i+1}`, text:choiceLimitedFrom("P_BUILD", P_BUILD), dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) plan.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
@@ -609,41 +586,6 @@ function finishNow(){
   openSummary();
 }
 
-/* ================== FULLSCREEN TOGGLE ================== */
-function isFullscreen(){
-  return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-}
-async function enterFullscreen(){
-  const el = document.documentElement; // or: els.container
-  try{
-    if (el.requestFullscreen) { await el.requestFullscreen({ navigationUI: 'hide' }); }
-    else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
-    else if (el.msRequestFullscreen) { el.msRequestFullscreen(); }
-    // Try locking portrait on mobile; ignore errors
-    if (screen.orientation && screen.orientation.lock) { screen.orientation.lock('portrait').catch(()=>{}); }
-  }catch(e){}
-}
-async function exitFullscreen(){
-  try{
-    if (document.exitFullscreen) { await document.exitFullscreen(); }
-    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-    else if (document.msExitFullscreen) { document.msExitFullscreen(); }
-  }catch(e){}
-}
-function updateFsBtn(){
-  const fs = !!isFullscreen();
-  els.fsBtn.classList.toggle('toggled', fs);
-  els.fsBtn.setAttribute('aria-pressed', fs ? 'true' : 'false');
-  els.fsBtn.textContent = fs ? '🗗 Exit Fullscreen' : '⛶ Fullscreen';
-}
-els.fsBtn.addEventListener('click', async ()=>{
-  if (isFullscreen()) await exitFullscreen(); else await enterFullscreen();
-  // Button will update on the event below; also call once as fallback:
-  updateFsBtn();
-});
-document.addEventListener('fullscreenchange', updateFsBtn);
-document.addEventListener('webkitfullscreenchange', updateFsBtn);
-
 /* ================== CONTROLS, PREFS, MODE TINT ================== */
 function setPrimary(btn, on){ btn.classList.toggle("primary", !!on); btn.setAttribute("aria-pressed", on ? "true" : "false"); }
 function setModeTag(){ els.modeTag.textContent = MODE === "DOM" ? "Dom Mode" : "Princess Mode"; }
@@ -682,13 +624,11 @@ els.soundBtn.addEventListener("click", ()=>{
   log("Sound " + (SOUND ? "enabled" : "disabled"));
 });
 
-/* Mode/length buttons */
 els.domBtn.addEventListener("click", ()=>{ MODE="DOM"; applyModeButtons(); log("Dom Mode selected"); });
 els.princessBtn.addEventListener("click", ()=>{ MODE="PRINCESS"; applyModeButtons(); log("Princess Mode selected"); });
 els.shortBtn.addEventListener("click", ()=>{ LENGTH="SHORT"; applyLengthButtons(); log("Short session selected"); });
 els.longBtn.addEventListener("click", ()=>{ LENGTH="LONG"; applyLengthButtons(); log("Long session selected"); });
 
-/* Transport */
 els.startBtn.addEventListener("click", start);
 els.pauseBtn.addEventListener("click", pause);
 els.skipBtn.addEventListener("click", skip);
@@ -740,7 +680,6 @@ els.closeSummaryBtn.addEventListener("click", closeSummary);
 applyModeButtons();
 applyLengthButtons();
 applySoundButton();
-updateFsBtn(); // initialize FS button label
 els.phase.textContent = "—";
 els.task.textContent = "Ready when you are.";
 els.clock.textContent = "00:00";
