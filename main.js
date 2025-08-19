@@ -1,12 +1,10 @@
 // main.js
 import { els } from "./ui.js";
-import { profile, updateLevelTag } from "./profile.js";
 import {
   start, pause, skip, finishNow,
   applyModeButtons, applyLengthButtons, applySoundButton,
   setMode, setLength, toggleSound, MODE, LENGTH
 } from "./engine.js";
-import { openAchievements, closeAchievements } from "./achievements.js";
 import { setupEasterEgg } from "./easteregg.js";
 
 function wireControls(){
@@ -51,16 +49,9 @@ function wireControls(){
 
 function boot(){
   // initial UI sync
-  updateLevelTag();
   applyModeButtons();
   applyLengthButtons();
   applySoundButton();
-  import { profile, updateLevelTag, progressToNext } from "./profile.js";
-import { updateLevelProgress } from "./ui.js";
-
-// boot()
-updateLevelTag();
-updateLevelProgress(profile.xp, progressToNext(profile.xp));
 
 
   // idle UI text
