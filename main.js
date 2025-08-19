@@ -55,6 +55,13 @@ function boot(){
   applyModeButtons();
   applyLengthButtons();
   applySoundButton();
+  import { profile, updateLevelTag, progressToNext } from "./profile.js";
+import { updateLevelProgress } from "./ui.js";
+
+// boot()
+updateLevelTag();
+updateLevelProgress(profile.xp, progressToNext(profile.xp));
+
 
   // idle UI text
   els.phase.textContent = "—";
