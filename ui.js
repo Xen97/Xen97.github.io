@@ -37,11 +37,6 @@ export const els = {
   // Easter egg
   ribbonEl: document.getElementById("secretRibbon"),
   confettiCanvas: document.getElementById("confetti"),
-  achievementsBtn: document.getElementById("achievementsBtn"),
-  achievementsOverlay: document.getElementById("achievementsOverlay"),
-  achievementsGrid: document.getElementById("achievementsGrid"),
-  achievementsCount: document.getElementById("achievementsCount"),
-  closeAchievementsBtn: document.getElementById("closeAchievementsBtn"),
 };
 
 const ICONS = {
@@ -77,12 +72,5 @@ export function setModeTag(mode){
 export function mmss(s){
   const m=Math.floor(s/60), sec=Math.max(0, Math.floor(s%60));
   return String(m).padStart(2,'0')+":"+String(sec).padStart(2,'0');
-}
-export function updateLevelProgress(xp, text){
-  const fill = document.getElementById("levelProgressFill");
-  const label = document.getElementById("levelProgressLabel");
-  if(!fill || !label) return;
-  fill.style.width = `${text.pct}%`;
-  label.textContent = `${text.gained} / ${text.need} XP`;
 }
 
