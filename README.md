@@ -78,8 +78,6 @@
     <header>
       <h1>Session Controller
         <span id="modeTag" class="pill">Princess Mode</span>
-</div>
-
       </h1>
       <p class="subtitle">Warm-up → Build-up → Cruel Overload → Final Reset → Finish</p>
     </header>
