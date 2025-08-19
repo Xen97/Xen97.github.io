@@ -66,11 +66,38 @@
   .ribbon.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .ribbon span{font-size:13px;}
   .confetti{position:fixed;inset:0;z-index:40;pointer-events:none;}
+  #pulseBg {
+  position: fixed;
+  inset: 0;
+  z-index: 0; /* behind cards */
+  pointer-events: none;
+  opacity: 0.15; /* subtle */
+}
+
+#pulseBg svg {
+  width: 100%;
+  height: 100%;
+}
+
+#pulsePath {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
 </style>
 </head>
 <body>
   <div class="container" id="container">
-    <div id="secretRibbon" class="ribbon hide" aria-hidden="true"><span>Made for Princess</span></div>
+  </div>
+  <div id="pulseBg" aria-hidden="true">
+  <svg viewBox="0 0 1200 200" preserveAspectRatio="none">
+    <path id="pulsePath" d="M0 100 Q 300 50, 600 100 T 1200 100" />
+  </svg>
+</div>
+
+  <div id="secretRibbon" class="ribbon hide" aria-hidden="true"><span>Made for Princess</span></div>
     <canvas id="confetti" class="confetti hide" aria-hidden="true"></canvas>
 
     <header>
