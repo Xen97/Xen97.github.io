@@ -66,8 +66,6 @@
   .ribbon.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .ribbon span{font-size:13px;}
   .confetti{position:fixed;inset:0;z-index:40;pointer-events:none;}
-  /* Achievements */
-  #achievementsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 </style>
 </head>
 <body>
