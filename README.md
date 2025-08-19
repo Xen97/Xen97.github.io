@@ -84,6 +84,11 @@
       <h1>Session Controller
         <span id="modeTag" class="pill">Princess Mode</span>
         <span id="levelTag" class="pill">Lv.1</span>
+        <div id="levelProgress" class="level-progress" aria-label="XP to next level">
+  <div class="fill" id="levelProgressFill"></div>
+  <div class="label" id="levelProgressLabel">0 / 90 XP</div>
+</div>
+
       </h1>
       <p class="subtitle">Warm-up → Build-up → Cruel Overload → Final Reset → Finish</p>
     </header>
