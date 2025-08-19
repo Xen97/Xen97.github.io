@@ -58,6 +58,18 @@
     appearance:none; border:1px solid var(--btn-border); background:var(--btn); color:#fff;
     padding:8px 10px; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer;
     transition:transform .04s ease, filter .15s ease;
+      .btn{
+    appearance:none; border:1px solid var(--btn-border); background:var(--btn); color:#fff;
+    padding:8px 10px; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer;
+    transition:transform .04s ease, filter .15s ease;
+
+    /* Prevent text selection / highlight on long-press */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   }
   .btn:active{ transform:translateY(1px); }
   .btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
