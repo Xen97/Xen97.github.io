@@ -39,3 +39,16 @@ export function updateLevelTag(){
   const tag = document.getElementById("levelTag");
   if(tag) tag.textContent = `Lv.${profile.level}`;
 }
+export function xpForLevel(level){ return Math.floor(100 * level * (level - 1) * 0.9); }
+export function levelFromXp(xp){ let lvl=1; while(xp >= xpForLevel(lvl+1)) lvl++; return Math.max(1,lvl); }
+
+// NEW:
+export function progressToNext(xp){
+  const curr = levelFromXp(xp);
+  const start = xpForLevel(curr);
+  const next  = xpForLevel(curr+1);
+  const gained = xp - start;
+  const need = Math.max(1, next - start);
+  return { curr, gained, need, pct: Math.min(100, Math.round(gained/need*100)) };
+}
+
