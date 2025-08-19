@@ -73,15 +73,6 @@
   .badge .icon{font-size:20px;line-height:1;}
   .badge .meta{font-size:12px;color:var(--muted);}
   .badge .title{font-weight:700;margin-bottom:4px;color:#e6e6e6;}
-  .level-progress{
-  position:relative; margin:6px 0 2px; height:8px; background:#222839;
-  border:1px solid #2a2f44; border-radius:999px; overflow:hidden;
-}
-.level-progress .fill{height:100%; width:0%; background:var(--accent); transition:width .25s ease;}
-.level-progress .label{
-  position:absolute; right:8px; top:-18px; font-size:11px; color:var(--muted);
-}
-
 </style>
 </head>
 <body>
@@ -92,8 +83,6 @@
     <header>
       <h1>Session Controller
         <span id="modeTag" class="pill">Princess Mode</span>
-        <span id="levelTag" class="pill">Lv.1</span>
-        <div id="levelProgress" class="level-progress" aria-label="XP to next level">
   <div class="fill" id="levelProgressFill"></div>
   <div class="label" id="levelProgressLabel">0 / 90 XP</div>
 </div>
@@ -109,7 +98,6 @@
           <button id="princessBtn" class="btn primary" aria-pressed="true">Princess Mode</button>
           <button id="shortBtn" class="btn" aria-pressed="false">Short</button>
           <button id="longBtn" class="btn primary" aria-pressed="true">Long</button>
-          <button id="achievementsBtn" class="btn ghost" title="Achievements">🏆 Achievements</button>
         </div>
         <div class="row">
           <button id="startBtn" class="btn ghost" title="S">Start</button>
@@ -160,15 +148,6 @@
         <button id="restartBtn" class="btn">Restart Session</button>
         <button id="closeSummaryBtn" class="btn primary">Close</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Achievements -->
-  <div class="overlay" id="achievementsOverlay">
-    <div class="summary">
-      <h2>Achievements <span class="pill" id="achievementsCount">0</span></h2>
-      <div id="achievementsGrid" class="grid"></div>
-      <div class="actions"><button id="closeAchievementsBtn" class="btn primary">Close</button></div>
     </div>
   </div>
 
