@@ -122,6 +122,38 @@ function updateMeterAndTimes(){
   els.eta.textContent = "~"+mmss(Math.ceil(totalRemain))+" left";
 }
 
+function updatePulse(phase){
+  const path = document.getElementById("pulsePath");
+  if(!path) return;
+
+  let speed, amp;
+
+  switch(phase){
+    case "Warm-up": 
+      speed = 4000; amp = 20; break;
+    case "Build-up": 
+      speed = 2500; amp = 35; break;
+    case "Cruel Overload": 
+      speed = 1200; amp = 55; break;
+    case "Final Reset": 
+      speed = 2000; amp = 25; break;
+    default: 
+      speed = 3000; amp = 30;
+  }
+
+  let start = null;
+  function animate(t){
+    if(!start) start = t;
+    const elapsed = t - start;
+    const x = elapsed / speed;
+    const d = `M0 100 Q 300 ${100 - Math.sin(x*2*Math.PI)*amp}, 600 100 T 1200 100`;
+    path.setAttribute("d", d);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+updatePulse(newPhaseName);
+
 export function pause(){ if(ticking){ stopTicking(); log("Paused","pause"); } else { startTicking(); log("Resumed","resume"); } }
 export function skip(){ if(!plan[current]) return; log(`Skipped: ${(plan[current].kind?plan[current].kind+": ":"")}${plan[current].text}`,"skip"); skipCount++; remain = 0.0001; }
 export function finishNow(){
