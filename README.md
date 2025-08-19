@@ -73,6 +73,15 @@
   .badge .icon{font-size:20px;line-height:1;}
   .badge .meta{font-size:12px;color:var(--muted);}
   .badge .title{font-weight:700;margin-bottom:4px;color:#e6e6e6;}
+  .level-progress{
+  position:relative; margin:6px 0 2px; height:8px; background:#222839;
+  border:1px solid #2a2f44; border-radius:999px; overflow:hidden;
+}
+.level-progress .fill{height:100%; width:0%; background:var(--accent); transition:width .25s ease;}
+.level-progress .label{
+  position:absolute; right:8px; top:-18px; font-size:11px; color:var(--muted);
+}
+
 </style>
 </head>
 <body>
