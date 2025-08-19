@@ -57,6 +57,12 @@ export function finalizeSessionAndProgress(sessionStats, log){
   profile.xp += gained;
   profile.level = levelFromXp(profile.xp);
   profile.sessions += 1;
+import { progressToNext } from "./profile.js";
+import { updateLevelProgress } from "./ui.js";
+
+// at end of finalizeSessionAndProgress(...)
+saveProfile(); updateLevelTag();
+updateLevelProgress(profile.xp, progressToNext(profile.xp));
 
   // bests
   profile.best.duration = Math.max(profile.best.duration, sessionStats.totalSecs);
