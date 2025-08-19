@@ -78,3 +78,11 @@ export function mmss(s){
   const m=Math.floor(s/60), sec=Math.max(0, Math.floor(s%60));
   return String(m).padStart(2,'0')+":"+String(sec).padStart(2,'0');
 }
+export function updateLevelProgress(xp, text){
+  const fill = document.getElementById("levelProgressFill");
+  const label = document.getElementById("levelProgressLabel");
+  if(!fill || !label) return;
+  fill.style.width = `${text.pct}%`;
+  label.textContent = `${text.gained} / ${text.need} XP`;
+}
+
