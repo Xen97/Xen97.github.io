@@ -5,7 +5,6 @@ import {
   P_WARM, P_BUILD, P_OVER, P_FINISH,
   timesFor, randInt, choice, maybeRest, resetChooser, choiceLimitedFrom
 } from "./tasks.js";
-import { finalizeSessionAndProgress } from "./achievements.js";
 
 export const LS_KEYS = { MODE:'sc_mode', LENGTH:'sc_length', SOUND:'sc_sound' };
 export let MODE   = localStorage.getItem(LS_KEYS.MODE)   || "PRINCESS";
