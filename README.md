@@ -155,6 +155,22 @@
     z-index: 40;
     pointer-events: none;
   }
+  /* Achievements grid */
+#achievementsGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.badge{
+  background:#151925; border:1px solid #222a3a; border-radius:10px; padding:10px;
+  display:flex; gap:10px; align-items:flex-start;
+  opacity:.9;
+}
+.badge.locked{ opacity:.45; filter:grayscale(0.4); }
+.badge .icon{ font-size:20px; line-height:1; }
+.badge .meta{ font-size:12px; color:var(--muted); }
+.badge .title{ font-weight:700; margin-bottom:4px; color:#e6e6e6; 
+}
 </style>
 </head>
 <body>
@@ -167,7 +183,11 @@
     <canvas id="confetti" class="confetti hide" aria-hidden="true"></canvas>
 
     <header>
-      <h1>Session Controller <span id="modeTag" class="pill">Princess Mode</span></h1>
+      <h1>Session Controller
+  <span id="modeTag" class="pill">Princess Mode</span>
+  <span id="levelTag" class="pill">Lv.1</span>
+</h1>
+
       <p class="subtitle">Warm-up → Build-up → Cruel Overload → Final Reset → Finish</p>
     </header>
 
@@ -175,6 +195,7 @@
       <div class="card sticky" aria-label="Controls">
         <!-- Row 1: mode & length -->
         <div class="row mb-6">
+          <button id="achievementsBtn" class="btn ghost" title="Achievements">🏆 Achievements</button>
           <button id="domBtn" class="btn" aria-pressed="false">Dom Mode</button>
           <button id="princessBtn" class="btn primary" aria-pressed="true">Princess Mode</button>
           <button id="shortBtn" class="btn" aria-pressed="false">Short</button>
@@ -236,6 +257,14 @@
       </div>
     </div>
   </div>
+  
+<div class="overlay" id="achievementsOverlay">
+  <div class="summary">
+    <h2>Achievements <span class="pill" id="achievementsCount">0</span></h2>
+    <div id="achievementsGrid" class="grid"></div>
+    <div class="actions"><button id="closeAchievementsBtn" class="btn primary">Close</button></div>
+  </div>
+</div>
 
 <script>
 /* ================== STATE ================== */
@@ -279,6 +308,167 @@ const els = {
   eta: $("#eta"),
   log: $("#log"),
 };
+
+  /* ================== PROFILE (XP, LEVEL, ACHIEVEMENTS) ================== */
+const PROFILE_KEY = "sc_profile_v1";
+const defaultProfile = () => ({
+  xp: 0,
+  level: 1,
+  sessions: 0,
+  best: { duration: 0, steps: 0 },
+  lastDay: null,    // "YYYY-MM-DD"
+  streak: 0,
+  unlocked: {},     // { [id]: true }
+});
+
+let profile = loadProfile();
+function loadProfile(){
+  try{ return {...defaultProfile(), ...JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}")} }
+  catch{ return defaultProfile(); }
+}
+function saveProfile(){ localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }
+
+function todayStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function xpForLevel(level){ // simple curve
+  return Math.floor(100 * level * (level - 1) * 0.9); // 0, 90, 270, 540, 900, ...
+}
+function levelFromXp(xp){
+  let lvl = 1;
+  while(xp >= xpForLevel(lvl+1)) lvl++;
+  return Math.max(1, lvl);
+}
+function updateLevelTag(){
+  const tag = document.getElementById("levelTag");
+  if(tag) tag.textContent = `Lv.${profile.level}`;
+}
+
+/* Define achievements once. Each has: id, title, desc, icon, test(stats, profile) */
+const ACHIEVEMENTS = [
+  { id:"first_blood", icon:"✨", title:"First Run",
+    desc:"Complete your first session.",
+    test:(s,p)=> p.sessions >= 1 },
+
+  { id:"no_skips", icon:"🎯", title:"Perfect Focus",
+    desc:"Finish a session with 0 skips.",
+    test:(s)=> s.skipCount === 0 },
+
+  { id:"iron_will", icon:"🧊", title:"Iron Will",
+    desc:"Finish a session with 0 rests.",
+    test:(s)=> s.restCount === 0 },
+
+  { id:"edge_marathon", icon:"⏱️", title:"Marathon",
+    desc:"Total active time ≥ 45 minutes.",
+    test:(s)=> s.totalSecs >= 45*60 },
+
+  { id:"overlord", icon:"💜", title:"Cruel Overlord",
+    desc:"Complete ≥ 8 Overload rounds (DOM mode).",
+    test:(s)=> s.mode==="DOM" && s.overRounds >= 8 },
+
+  { id:"princess_power", icon:"💗", title:"Princess Power",
+    desc:"Complete ≥ 6 Build rounds (PRINCESS mode).",
+    test:(s)=> s.mode==="PRINCESS" && s.buildCycles >= 6 },
+
+  { id:"finisher_variety", icon:"🔀", title:"Variety Pack",
+    desc:"Use 3 different finishers across runs.",
+    test:(s,p)=> Object.keys(p.unlockedFinishers||{}).length >= 3 },
+
+  { id:"streak3", icon:"🔥", title:"On a Roll",
+    desc:"3-day session streak.",
+    test:(s,p)=> p.streak >= 3 },
+
+  { id:"streak7", icon:"⚡", title:"Unstoppable",
+    desc:"7-day session streak.",
+    test:(s,p)=> p.streak >= 7 },
+];
+
+/* UI for Achievements modal */
+const achOverlay = document.getElementById("achievementsOverlay");
+const achGrid = document.getElementById("achievementsGrid");
+const achCount = document.getElementById("achievementsCount");
+document.getElementById("achievementsBtn")?.addEventListener("click", openAchievements);
+document.getElementById("closeAchievementsBtn")?.addEventListener("click", ()=> achOverlay.classList.remove("show"));
+
+function openAchievements(){
+  if(!achGrid) return;
+  achGrid.innerHTML = "";
+  let unlockedCount = 0;
+  ACHIEVEMENTS.forEach(a=>{
+    const unlocked = !!profile.unlocked[a.id];
+    if(unlocked) unlockedCount++;
+    const card = document.createElement("div");
+    card.className = "badge" + (unlocked ? "" : " locked");
+    card.innerHTML = `
+      <div class="icon">${a.icon}</div>
+      <div>
+        <div class="title">${a.title}</div>
+        <div class="meta">${a.desc}</div>
+      </div>`;
+    achGrid.appendChild(card);
+  });
+  if(achCount) achCount.textContent = `${unlockedCount}/${ACHIEVEMENTS.length}`;
+  achOverlay.classList.add("show");
+}
+
+/* Called at end of session to award XP & unlock cheevos */
+function finalizeSessionAndProgress(sessionStats){
+  // XP rules (tweak freely)
+  // +5 per step, +1 per minute total, +10 if 0 skips, +10 if 0 rests, +5 if LONG
+  let gained = 0;
+  gained += 5 * sessionStats.steps;
+  gained += Math.round(sessionStats.totalSecs / 60);
+  if(sessionStats.skipCount === 0) gained += 10;
+  if(sessionStats.restCount === 0) gained += 10;
+  if(sessionStats.length === "LONG") gained += 5;
+
+  profile.xp += gained;
+  profile.level = levelFromXp(profile.xp);
+  profile.sessions += 1;
+
+  // bests
+  profile.best.duration = Math.max(profile.best.duration, sessionStats.totalSecs);
+  profile.best.steps = Math.max(profile.best.steps, sessionStats.steps);
+
+  // finisher variety tracking
+  profile.unlockedFinishers = profile.unlockedFinishers || {};
+  if(sessionStats.finisher) profile.unlockedFinishers[sessionStats.finisher] = true;
+
+  // streak
+  const today = todayStr();
+  if(profile.lastDay === today){
+    // already counted today
+  } else {
+    if(profile.lastDay){
+      const last = new Date(profile.lastDay);
+      const now = new Date(today);
+      const diff = (now - last)/(1000*60*60*24);
+      profile.streak = (diff === 1) ? (profile.streak + 1) : 1;
+    } else {
+      profile.streak = 1;
+    }
+    profile.lastDay = today;
+  }
+
+  // achievements
+  const newly = [];
+  ACHIEVEMENTS.forEach(a=>{
+    if(!profile.unlocked[a.id] && a.test(sessionStats, profile)){
+      profile.unlocked[a.id] = true;
+      newly.push(a);
+    }
+  });
+
+  saveProfile();
+  updateLevelTag();
+  if(newly.length){
+    newly.forEach(a=> log(`🏆 Achievement unlocked: ${a.title}`));
+  }
+  log(`+${gained} XP (Lvl ${profile.level})`);
+}
+
 
 /* ================== LOGGING WITH ICONS ================== */
 const ICONS = {
@@ -704,8 +894,24 @@ function openSummary(){
   els.sumFinisher.textContent = finisherUsed || "—";
   els.sumTimes.textContent = `${startStr} → ${endStr}`;
 
+  // derive rough counts for achievements from the active timing preset
+  const t = timesFor(MODE==="DOM" ? "DOM" : "PRINCESS", LENGTH);
+  const sessionStats = {
+    mode: (MODE==="DOM" ? "DOM" : "PRINCESS"),
+    length: LENGTH,
+    steps: completedSteps,
+    restCount,
+    skipCount,
+    finisher: finisherUsed || null,
+    totalSecs,
+    overRounds: (MODE==="DOM" ? t.overRounds : 0),
+    buildCycles: (MODE==="PRINCESS" ? t.buildCycles : 0),
+  };
+
+  finalizeSessionAndProgress(sessionStats);
   els.overlay.classList.add("show");
 }
+
 function closeSummary(){ els.overlay.classList.remove("show"); }
 function saveLog(){
   const lines = Array.from(els.log.children).map(n => n.textContent);
@@ -820,6 +1026,7 @@ els.princessBtn.addEventListener("pointerdown", ()=>{
 els.princessBtn.addEventListener("contextmenu", e=> e.preventDefault());
 
 /* ================== INIT ================== */
+updateLevelTag();
 applyModeButtons();
 applyLengthButtons();
 applySoundButton();
