@@ -1,7 +1,8 @@
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <title>Session Controller (Dom / Princess)</title>
 <style>
   :root{
@@ -715,9 +716,9 @@ els.saveLogBtn.addEventListener("click", saveLog);
 els.restartBtn.addEventListener("click", ()=>{ closeSummary(); start(); });
 els.closeSummaryBtn.addEventListener("click", closeSummary);
 
-/* ================== EASTER EGG (Princess button triple-click) ================== */
-let secretClicks = 0;
-let secretTimer = null;
+/* ================== EASTER EGG (Princess button LONG-PRESS) ================== */
+const LONG_PRESS_MS = 1600; // hold duration (1.6s) – tweak if you like
+let lpTimer = null;
 
 // visuals refs
 const ribbonEl = document.getElementById("secretRibbon");
@@ -801,16 +802,16 @@ function triggerEasterEgg(){
   heartConfettiBurst(); // hearts
 }
 
-// Triple-click detection on the Princess Mode button
-els.princessBtn.addEventListener("click", ()=>{
-  secretClicks++;
-  clearTimeout(secretTimer);
-  secretTimer = setTimeout(()=>{ secretClicks = 0; }, 600); // 600ms window
-  if(secretClicks >= 3){
-    secretClicks = 0;
-    triggerEasterEgg();
-  }
+// Long-press detection using Pointer Events (covers touch & mouse)
+els.princessBtn.addEventListener("pointerdown", ()=>{
+  clearTimeout(lpTimer);
+  lpTimer = setTimeout(()=>{ triggerEasterEgg(); }, LONG_PRESS_MS);
 });
+["pointerup","pointercancel","pointerleave"].forEach(ev=>{
+  els.princessBtn.addEventListener(ev, ()=> clearTimeout(lpTimer));
+});
+// prevent iOS touch-callout on long-press
+els.princessBtn.addEventListener("contextmenu", e=> e.preventDefault());
 
 /* ================== INIT ================== */
 applyModeButtons();
