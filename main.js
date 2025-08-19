@@ -28,10 +28,6 @@ function wireControls(){
     import("./engine.js").then(m=> m.saveLog && m.saveLog());
   });
 
-  // Achievements modal
-  els.achievementsBtn?.addEventListener("click", openAchievements);
-  els.closeAchievementsBtn?.addEventListener("click", closeAchievements);
-
   // Keyboard
   window.addEventListener("keydown", (e)=>{
     if(e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
