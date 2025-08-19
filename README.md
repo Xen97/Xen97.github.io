@@ -195,11 +195,11 @@
       <div class="card sticky" aria-label="Controls">
         <!-- Row 1: mode & length -->
         <div class="row mb-6">
-          <button id="achievementsBtn" class="btn ghost" title="Achievements">🏆 Achievements</button>
           <button id="domBtn" class="btn" aria-pressed="false">Dom Mode</button>
           <button id="princessBtn" class="btn primary" aria-pressed="true">Princess Mode</button>
           <button id="shortBtn" class="btn" aria-pressed="false">Short</button>
           <button id="longBtn" class="btn primary" aria-pressed="true">Long</button>
+          <button id="achievementsBtn" class="btn ghost" title="Achievements">🏆 Achievements</button>
         </div>
 
         <!-- Row 2: transport controls + Sound toggle -->
