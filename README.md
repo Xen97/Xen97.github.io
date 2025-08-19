@@ -68,11 +68,6 @@
   .confetti{position:fixed;inset:0;z-index:40;pointer-events:none;}
   /* Achievements */
   #achievementsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .badge{background:#151925;border:1px solid #222a3a;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:flex-start;opacity:.9;}
-  .badge.locked{opacity:.45;filter:grayscale(.4);}
-  .badge .icon{font-size:20px;line-height:1;}
-  .badge .meta{font-size:12px;color:var(--muted);}
-  .badge .title{font-weight:700;margin-bottom:4px;color:#e6e6e6;}
 </style>
 </head>
 <body>
@@ -83,8 +78,6 @@
     <header>
       <h1>Session Controller
         <span id="modeTag" class="pill">Princess Mode</span>
-  <div class="fill" id="levelProgressFill"></div>
-  <div class="label" id="levelProgressLabel">0 / 90 XP</div>
 </div>
 
       </h1>
