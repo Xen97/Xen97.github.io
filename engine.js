@@ -221,33 +221,36 @@ function buildPrincessPlan(){
   return {plan, finisherPool:P_FINISH};
 }
 
+// Replace your openSummary() with this:
 function openSummary(){
-  const totalSecs = plan.reduce((a,b)=>a+b.dur,0);
-  const startStr = sessionStart ? sessionStart.toLocaleTimeString() : "—";
-  const endStr   = sessionEnd ? sessionEnd.toLocaleTimeString() : "—";
-  els.summaryMode.textContent = MODE === "DOM" ? "Dom Mode" : "Princess Mode";
-  els.sumDuration.textContent = mmss(Math.round(totalSecs));
-  els.sumSteps.textContent = String(completedSteps);
-  els.sumRests.textContent = String(restCount);
-  els.sumSkips.textContent = String(skipCount);
-  els.sumFinisher.textContent = finisherUsed || "—";
-  els.sumTimes.textContent = `${startStr} → ${endStr}`;
+  try{
+    // totalSecs: if plan is empty, fall back to 0
+    const totalSecs = Array.isArray(plan) && plan.length
+      ? plan.reduce((a,b)=> a + (b?.dur||0), 0)
+      : 0;
 
-  const t = timesFor(MODE, LENGTH);
-  const sessionStats = {
-    mode: MODE,
-    length: LENGTH,
-    steps: completedSteps,
-    restCount,
-    skipCount,
-    finisher: finisherUsed || null,
-    totalSecs,
-    overRounds: (MODE==="DOM" ? t.overRounds : 0),
-    buildCycles: (MODE==="PRINCESS" ? t.buildCycles : 0),
-  };
+    // Safe time strings
+    const startStr = sessionStart instanceof Date ? sessionStart.toLocaleTimeString() : "—";
+    const endStr   = sessionEnd   instanceof Date ? sessionEnd.toLocaleTimeString()   : "—";
 
-  finalizeSessionAndProgress(sessionStats, log);
-  els.overlay.classList.add("show");
+    // Mode tag
+    if(els.summaryMode) els.summaryMode.textContent = (MODE === "DOM" ? "Dom Mode" : "Princess Mode");
+
+    // Stats
+    if(els.sumDuration) els.sumDuration.textContent = mmss(Math.max(0, Math.round(totalSecs)));
+    if(els.sumSteps)    els.sumSteps.textContent    = String(completedSteps || 0);
+    if(els.sumRests)    els.sumRests.textContent    = String(restCount || 0);
+    if(els.sumSkips)    els.sumSkips.textContent    = String(skipCount || 0);
+    if(els.sumFinisher) els.sumFinisher.textContent = finisherUsed || "—";
+    if(els.sumTimes)    els.sumTimes.textContent    = `${startStr} → ${endStr}`;
+
+    // Show overlay
+    els.overlay?.classList.add("show");
+  }catch(err){
+    console.error("openSummary error:", err);
+    // Fail gracefully so the app keeps working
+    els.overlay?.classList.add("show");
+  }
 }
 
 export function closeSummary(){ els.overlay.classList.remove("show"); }
