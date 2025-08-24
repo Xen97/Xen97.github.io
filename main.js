@@ -3,12 +3,13 @@ import { els } from "./ui.js";
 import {
   start, pause, skip, finishNow,
   applyModeButtons, applyLengthButtons, applySoundButton,
-  setMode, setLength, toggleSound, MODE, LENGTH
+  setMode, setLength, toggleSound, MODE, LENGTH, setSolo
 } from "./engine.js";
 import { setupEasterEgg } from "./easteregg.js";
-import { setSolo, MODE } from "./engine.js";
+
+// optional: guard if you hide the button in some modes
 els.soloBtn?.addEventListener("click", ()=>{
-  const on = MODE !== "PRINCESS_SOLO";
+  const on = (MODE !== "PRINCESS_SOLO");
   setSolo(on);
   els.soloBtn.classList.toggle("toggled", on);
   els.soloBtn.setAttribute("aria-pressed", on ? "true" : "false");
@@ -31,9 +32,7 @@ function wireControls(){
   // Summary
   els.closeSummaryBtn.addEventListener("click", ()=> els.overlay.classList.remove("show"));
   els.restartBtn.addEventListener("click", ()=>{ els.overlay.classList.remove("show"); start(); });
-  els.saveLogBtn.addEventListener("click", ()=>{
-    import("./engine.js").then(m=> m.saveLog && m.saveLog());
-  });
+  els.saveLogBtn.addEventListener("click", ()=> import("./engine.js").then(m=> m.saveLog && m.saveLog()));
 
   // Keyboard
   window.addEventListener("keydown", (e)=>{
@@ -46,18 +45,14 @@ function wireControls(){
     else if(e.key.toLowerCase() === "l"){ setLength(LENGTH==="LONG"?"SHORT":"LONG"); }
   });
 
-  // Easter egg long press on Princess button
   setupEasterEgg(els.princessBtn);
 }
 
 function boot(){
-  // initial UI sync
   applyModeButtons();
   applyLengthButtons();
   applySoundButton();
 
-
-  // idle UI text
   els.phase.textContent = "—";
   els.task.textContent = "Ready when you are.";
   els.clock.textContent = "00:00";
@@ -65,5 +60,4 @@ function boot(){
 
   wireControls();
 }
-
 boot();
