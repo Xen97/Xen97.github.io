@@ -5,6 +5,14 @@ import {
   P_WARM, P_BUILD, P_OVER, P_FINISH,
   timesFor, randInt, choice, maybeRest, resetChooser, choiceLimitedFrom
 } from "./tasks.js";
+import { SOLO_POOLS, SOLO_MODIFIERS } from "./tasks.js";
+function pickWeighted(entries){
+  // entries: [{item:'SUCKY', w:10}, ...]
+  const total = entries.reduce((a,b)=>a+b.w,0);
+  let r = Math.random() * total;
+  for(const e of entries){ r -= e.w; if(r <= 0) return e.item; }
+  return entries[0]?.item;
+}
 
 export const LS_KEYS = { MODE:'sc_mode', LENGTH:'sc_length', SOUND:'sc_sound' };
 export let MODE   = localStorage.getItem(LS_KEYS.MODE)   || "PRINCESS";
@@ -41,12 +49,22 @@ export function start(){
   current=0; completedSteps=0; restCount=0; skipCount=0; finisherUsed="—"; prevPhase="";
   const r = (MODE==="DOM") ? buildDomPlan() : buildPrincessPlan();
   plan=r.plan; finisherPool=r.finisherPool;
+  const r = buildPlanForMode();
+  plan = r.plan; finisherPool = r.finisherPool;
   remain = plan[0]?.dur || 0;
   totalRemain = computeTotalRemain(0);
   sessionStart = new Date(); sessionEnd = null;
   render(true);
   log(`Session started (${MODE}, ${LENGTH})`,"info");
   startTicking();
+// somewhere near your MODE handling
+// MODE can be "DOM", "PRINCESS", "PRINCESS_SOLO"
+function buildPlanForMode(){
+  if(MODE === "DOM") return buildDomPlan();
+  if(MODE === "PRINCESS_SOLO") return buildSoloPrincessPlan();
+  return buildPrincessPlan();
+}
+
 }
 
 function startTicking(){ stopTicking(); ticking = true; lastTs = performance.now(); intervalId = setInterval(onTickFrame, 200); }
@@ -136,6 +154,67 @@ export function finishNow(){
   els.eta.textContent = "~00:00 left";
   sessionEnd = new Date();
   openSummary();
+}
+export function buildSoloPrincessPlan(){
+  const t = timesFor("PRINCESS", LENGTH); // reuse your existing timing curve
+  const plan = [];
+
+  // Strong bias to SUCKY; tweak weights to taste
+  const warmWts  = [{item:"SUCKY", w:8}, {item:"WAND", w:2}, {item:"ZUMIO", w:2}];
+  const buildWts = [{item:"SUCKY", w:9}, {item:"WAND", w:2}, {item:"ZUMIO", w:2}];
+  const overWts  = [{item:"SUCKY", w:10}, {item:"WAND", w:2}, {item:"ZUMIO", w:2}];
+
+  const addStep = (phase, toy, text, dur) => {
+    // 20% chance to append a soft “say out loud” modifier
+    if(Math.random() < 0.20){
+      text += " — " + choice(SOLO_MODIFIERS);
+    }
+    plan.push({
+      phase,
+      kind: `${toy} ${phase.includes("Overload")?"Lock": phase.includes("Build")?"Build":"Warm"}`,
+      toy, text, dur
+    });
+  };
+
+  // Warm-up
+  const warmRounds = choice(t.warmRounds);
+  for(let i=0;i<warmRounds;i++){
+    const d = randInt(...t.warmSpan);
+    const toy = pickWeighted(warmWts);
+    const pool = (toy==="SUCKY") ? SOLO_SUCKY_WARM
+               : (toy==="WAND")  ? SOLO_WAND_WARM
+               :                   SOLO_ZUMIO_WARM;
+    addStep("Warm-up", toy, choiceLimitedFrom("SOLO_WARM_"+toy, pool), d);
+    const r = maybeRest(t.restWB, t.restProb); if(r) plan.push({phase:"Warm-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
+  }
+
+  // Build-up
+  for(let i=0;i<t.buildCycles;i++){
+    const d = randInt(...t.buildSpan);
+    const toy = pickWeighted(buildWts);
+    const pool = (toy==="SUCKY") ? SOLO_SUCKY_BUILD
+               : (toy==="WAND")  ? SOLO_WAND_BUILD
+               :                   SOLO_ZUMIO_BUILD;
+    addStep("Build-up", toy, choiceLimitedFrom("SOLO_BUILD_"+toy, pool), d);
+    const r = maybeRest(t.restWB, t.restProb); if(r) plan.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
+  }
+
+  // Overload
+  for(let i=0;i<t.overRounds;i++){
+    const d = randInt(...t.overSpan);
+    const toy = pickWeighted(overWts);
+    const pool = (toy==="SUCKY") ? SOLO_SUCKY_OVER
+               : (toy==="WAND")  ? SOLO_WAND_OVER
+               :                   SOLO_ZUMIO_OVER;
+    addStep("Cruel Overload", toy, choiceLimitedFrom("SOLO_OVER_"+toy, pool), d);
+    const r = maybeRest(t.restOver, t.restProb); if(r) plan.push({phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r});
+  }
+
+  // Final Reset — Solo ends in denial by design
+  plan.push({phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe. You’re denied until Sir permits.", dur:t.finalReset});
+
+  // Finisher pool is empty; Solo always “denied”
+  return { plan, finisherPool: [] };
 }
 
 export function applyModeButtons(){
