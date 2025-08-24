@@ -176,17 +176,20 @@ export function choiceLimitedFrom(poolKey, arr){
   let tries = 0;
   while(tries < 50){
     const candidate = arr[randInt(0, arr.length-1)];
-    const used = usageCounts[poolKey][candidate] || 0;
-    if(used < 2 && candidate !== lastPick[poolKey]){
-      usageCounts[poolKey][candidate] = used + 1;
-      lastPick[poolKey] = candidate;
+    const label = (typeof candidate === "string") ? candidate : candidate.text;
+    const used = usageCounts[poolKey][label] || 0;
+    if(used < 2 && label !== lastPick[poolKey]){
+      usageCounts[poolKey][label] = used + 1;
+      lastPick[poolKey] = label;
       return candidate;
     }
     tries++;
   }
-  const candidates = arr.filter(t => (usageCounts[poolKey][t]||0) < 2);
-  const fallback = (candidates.length ? choice(candidates) : choice(arr));
-  usageCounts[poolKey][fallback] = (usageCounts[poolKey][fallback]||0) + 1;
-  lastPick[poolKey] = fallback;
+  const available = arr.filter(t => (usageCounts[poolKey][typeof t === "string" ? t : t.text] || 0) < 2);
+  const fallback = available.length ? choice(available) : choice(arr);
+  const label = (typeof fallback === "string") ? fallback : fallback.text;
+  usageCounts[poolKey][label] = (usageCounts[poolKey][label] || 0) + 1;
+  lastPick[poolKey] = label;
   return fallback;
 }
+
