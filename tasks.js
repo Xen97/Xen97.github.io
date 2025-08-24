@@ -70,31 +70,6 @@ export const P_FINISH = [
   "Pulse & Trap — sucky level 8 in bursts while fingering",
   "Forced Lick Finish — pin her thighs; rapid tongue on clit + hard fingering"
 ];
-
-export function timesFor(mode, length){
-  if(mode==="DOM"){
-    return (length==="SHORT") ? {
-      warmRounds:[2,3], buildCycles:3, overRounds:5,
-      warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
-      restWB:[10,18], restOver:[10,15], finalReset:60, restProb:0.15
-    } : {
-      warmRounds:[3,4], buildCycles:6, overRounds:9,
-      warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
-      restWB:[10,18], restOver:[10,15], finalReset:90, restProb:0.15
-    };
-  } else {
-    if (length==="SHORT"){
-      return {
-        warmRounds:[3,4], buildCycles:4, overRounds:6,
-        warmSpan:[90,150], buildSpan:[90,150], overSpan:[120,210],
-        restWB:[10,20], restOver:[10,15], finalReset:120, restProb:0.10
-      };
-    } else {
-      return {
-        warmRounds:[4,6], buildCycles:6, overRounds:10,
-        warmSpan:[90,150], buildSpan:[90,150], overSpan:[150,240],
-        restWB:[15,25], restOver:[12,18], finalReset:150, restProb:0.08
-      };
       // --- SOLO PRINCESS (no fingering) ---
 // Toy-specific pools; short, direct, fluid.
 
@@ -164,6 +139,30 @@ export const SOLO_POOLS = {
     }
   }
 }
+export function timesFor(mode, length){
+  if(mode==="DOM"){
+    return (length==="SHORT") ? {
+      warmRounds:[2,3], buildCycles:3, overRounds:5,
+      warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
+      restWB:[10,18], restOver:[10,15], finalReset:60, restProb:0.15
+    } : {
+      warmRounds:[3,4], buildCycles:6, overRounds:9,
+      warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
+      restWB:[10,18], restOver:[10,15], finalReset:90, restProb:0.15
+    };
+  } else {
+    if (length==="SHORT"){
+      return {
+        warmRounds:[3,4], buildCycles:4, overRounds:6,
+        warmSpan:[90,150], buildSpan:[90,150], overSpan:[120,210],
+        restWB:[10,20], restOver:[10,15], finalReset:120, restProb:0.10
+      };
+    } else {
+      return {
+        warmRounds:[4,6], buildCycles:6, overRounds:10,
+        warmSpan:[90,150], buildSpan:[90,150], overSpan:[150,240],
+        restWB:[15,25], restOver:[12,18], finalReset:150, restProb:0.08
+      };
 
 /* chooser helpers used by engine */
 export function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
