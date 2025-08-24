@@ -1,5 +1,6 @@
 <html lang="en">
 <head>
+  <link rel="icon" href="data:,">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <title>Session Controller (Dom / Princess)</title>
