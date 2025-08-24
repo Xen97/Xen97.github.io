@@ -6,6 +6,13 @@ import {
   setMode, setLength, toggleSound, MODE, LENGTH
 } from "./engine.js";
 import { setupEasterEgg } from "./easteregg.js";
+import { setSolo, MODE } from "./engine.js";
+els.soloBtn?.addEventListener("click", ()=>{
+  const on = MODE !== "PRINCESS_SOLO";
+  setSolo(on);
+  els.soloBtn.classList.toggle("toggled", on);
+  els.soloBtn.setAttribute("aria-pressed", on ? "true" : "false");
+});
 
 function wireControls(){
   // Mode/length/sound
