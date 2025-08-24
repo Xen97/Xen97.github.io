@@ -95,6 +95,72 @@ export function timesFor(mode, length){
         warmSpan:[90,150], buildSpan:[90,150], overSpan:[150,240],
         restWB:[15,25], restOver:[12,18], finalReset:150, restProb:0.08
       };
+      // --- SOLO PRINCESS (no fingering) ---
+// Toy-specific pools; short, direct, fluid.
+
+export const SOLO_SUCKY_WARM = [
+  "Seal sucky on clit at level 2 — no movement",
+  "Pulse: seal briefly, lift briefly — keep it gentle",
+  "Hover just above clit, then seal softly — tease the seal"
+];
+export const SOLO_SUCKY_BUILD = [
+  "Seal tight at level 3–4 — hands still",
+  "Hold the seal and breathe — ride the pull",
+  "Re-seal if it slips — keep pressure constant"
+];
+export const SOLO_SUCKY_OVER = [
+  "Lock level 4 and don’t move it",
+  "Press harder into the seal — no mercy",
+  "Hold the seal through every twitch — do not back off"
+];
+
+export const SOLO_WAND_WARM = [
+  "Rest the wand just above clit, low power",
+  "Use the side of the wand head — feather-light",
+  "Flat contact but soft pressure — stay gentle"
+];
+export const SOLO_WAND_BUILD = [
+  "Clamp wand flat at medium — no grinding",
+  "Rock the wand side-to-side slowly",
+  "Hold steady and let the throb do it"
+];
+export const SOLO_WAND_OVER = [
+  "Press the wand flat, firmer — do not ease up",
+  "Pin her clit — steady, unbroken pressure",
+  "Hold through the urge to move — stay locked"
+];
+
+export const SOLO_ZUMIO_WARM = [
+  "Trace tiny circles around the clit hood only",
+  "Draw figure-8s around, never direct contact",
+  "Skim the edge of the hood — barely touching"
+];
+export const SOLO_ZUMIO_BUILD = [
+  "Pinpoint on one side of clit — steady contact",
+  "Tiny fast circles on the hood’s edge",
+  "Slow spiral inward — stop at the edge"
+];
+export const SOLO_ZUMIO_OVER = [
+  "Hard pinpoint to the same spot — unflinching",
+  "Hold the tip firm — micro-circles only",
+  "Pin and vibrate — no retreat"
+];
+
+// Optional “say out loud” modifiers (sprinkled occasionally)
+export const SOLO_MODIFIERS = [
+  "Say out loud: “I belong to Sir.”",
+  "Whisper: “Thank you, Sir.”",
+  "Say: “I wish Sir was here watching me.”",
+  "Breathe out and count your breaths softly."
+];
+
+// Convenience map so engine can grab by toy+phase
+export const SOLO_POOLS = {
+  SUCKY: { WARM: SOLO_SUCKY_WARM, BUILD: SOLO_SUCKY_BUILD, OVER: SOLO_SUCKY_OVER },
+  WAND:  { WARM: SOLO_WAND_WARM,  BUILD: SOLO_WAND_BUILD,  OVER: SOLO_WAND_OVER  },
+  ZUMIO: { WARM: SOLO_ZUMIO_WARM, BUILD: SOLO_ZUMIO_BUILD, OVER: SOLO_ZUMIO_OVER }
+};
+
     }
   }
 }
