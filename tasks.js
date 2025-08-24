@@ -96,18 +96,18 @@ export const SOLO_WAND_WARM = [
 export const SOLO_WAND_BUILD = [
   { text: "Hold wand between thighs level 2", dur: [30, 120] },
   { text: "Grind on wand level 2", dur: [50, 120] },
-  { text: "Hold on clit level 2" dur: [40, 110] },
+  { text: "Hold on clit level 2", dur: [40, 110] },
 ];
 export const SOLO_WAND_OVER = [
   { text: "Wand on clit, firm level 3", dur: [20, 70] },
   { text: "Hold wand between thighs level 3", dur: [20, 90] },
-  { text: "Push wand hard against clit level 3" dur: [20, 60] },
+  { text: "Push wand hard against clit level 3", dur: [20, 60] },
 ];
 
 export const SOLO_ZUMIO_WARM = [
   { text: "Trace tiny circles around the clit hood only", dur: [20, 60] },
   { text: "Drag toy from below clit up and over", dur: [20, 40] },
-  { text: "Skim the edge of the hood — barely touching" dur: [20, 60] },
+  { text: "Skim the edge of the hood — barely touching", dur: [20, 60] },
 ];
 export const SOLO_ZUMIO_BUILD = [
   { text: "Pinpoint on one side of clit", dur: [20, 60] },
