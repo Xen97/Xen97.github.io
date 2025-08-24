@@ -331,6 +331,9 @@ function openSummary(){
     if(els.sumSkips)    els.sumSkips.textContent    = String(skipCount || 0);
     if(els.sumFinisher) els.sumFinisher.textContent = finisherUsed || "—";
     if(els.sumTimes)    els.sumTimes.textContent    = `${startStr} → ${endStr}`;
+if (MODE === "PRINCESS_SOLO") {
+  els.sumFinisher.textContent = "Denied (Solo)";
+}
 
     // Show overlay
     els.overlay?.classList.add("show");
