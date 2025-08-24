@@ -85,6 +85,7 @@
         <div class="row mb-6">
           <button id="domBtn" class="btn" aria-pressed="false">Dom Mode</button>
           <button id="princessBtn" class="btn primary" aria-pressed="true">Princess Mode</button>
+          <button id="soloBtn" class="btn ghost" aria-pressed="false" title="Solo Princess">Solo</button>
           <button id="shortBtn" class="btn" aria-pressed="false">Short</button>
           <button id="longBtn" class="btn primary" aria-pressed="true">Long</button>
         </div>
