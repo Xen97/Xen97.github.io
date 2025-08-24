@@ -62,7 +62,22 @@ function playChime(){
   }catch(e){}
 }
 
-/* ---------------- Helpers ---------------- */
+/* ---------------- Helpers ---------------- */// engine.js
+
+function resolveDuration(task, fallbackRange){
+  // task.dur can be a number or [min,max]
+  if (task && typeof task === "object" && "dur" in task){
+    const d = task.dur;
+    return Array.isArray(d) ? randInt(d[0], d[1]) : d;
+  }
+  // fallback to the phase span if pool item was a plain string
+  return randInt(fallbackRange[0], fallbackRange[1]);
+}
+
+function taskText(task){
+  return (typeof task === "string") ? task : task.text;
+}
+
 function computeTotalRemain(fromIndex=0){
   return plan.slice(fromIndex).reduce((a,b)=> a + (b?.dur || 0), 0);
 }
@@ -355,23 +370,54 @@ function buildPrincessPlan(){
   return { plan: planOut, finisherPool: P_FINISH };
 }
 
-export function buildSoloPrincessPlan(){
-  const t = timesFor("PRINCESS", LENGTH);
-  const out = [];
+import { SOLO_POOLS, timesFor, choiceLimitedFrom, randInt } from "./tasks.js";
 
-  // Strong bias to Sucky (Princess’ favorite)
-  const warmWts  = [{item:"SUCKY", w:8},  {item:"WAND", w:2}, {item:"ZUMIO", w:2}];
-  const buildWts = [{item:"SUCKY", w:9},  {item:"WAND", w:2}, {item:"ZUMIO", w:2}];
-  const overWts  = [{item:"SUCKY", w:12}, {item:"WAND", w:2}, {item:"ZUMIO", w:2}];
+// assuming you have toy = "SUCKY" | "WAND" | "ZUMIO"
+function buildSoloPrincessPlan(toy, length){
+  const t = timesFor("PRINCESS", length);
+  const pools = SOLO_POOLS[toy];
+  const plan = [];
 
-  const addStep = (phase, toy, text, dur) => {
-    if(Math.random() < 0.20) text += " — " + choice(SOLO_MODIFIERS);
-    out.push({
-      phase,
-      kind: `${toy} ${phase.includes("Overload")?"Lock": phase.includes("Build")?"Build":"Warm"}`,
-      toy, text, dur
+  // Warm-up rounds
+  const warmRounds = choice(t.warmRounds);
+  for(let i=0; i<warmRounds; i++){
+    const pick = choiceLimitedFrom(`${toy}_WARM`, pools.WARM);
+    plan.push({
+      phase:"Warm-up",
+      toy,
+      text: `[${toy}] ${taskText(pick)}`,
+      dur: resolveDuration(pick, t.warmSpan),
     });
-  };
+  }
+
+  // Build cycles
+  for(let i=0; i<t.buildCycles; i++){
+    const pick = choiceLimitedFrom(`${toy}_BUILD`, pools.BUILD);
+    plan.push({
+      phase:"Build-up",
+      toy,
+      text: `[${toy}] ${taskText(pick)}`,
+      dur: resolveDuration(pick, t.buildSpan),
+    });
+  }
+
+  // Over rounds
+  for(let i=0; i<t.overRounds; i++){
+    const pick = choiceLimitedFrom(`${toy}_OVER`, pools.OVER);
+    plan.push({
+      phase:"Cruel Overload",
+      toy,
+      text: `[${toy}] ${taskText(pick)}`,
+      dur: resolveDuration(pick, t.overSpan),
+    });
+  }
+
+  // Final Reset
+  plan.push({ phase:"Final Reset", toy, text:"No touch. Breathe.", dur:t.finalReset });
+
+  return plan;
+}
+
 
   // Warm-up
   const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
