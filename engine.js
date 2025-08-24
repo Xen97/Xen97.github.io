@@ -12,11 +12,8 @@ import {
   // Timing + chooser utils
   timesFor, randInt, choice, maybeRest, resetChooser, choiceLimitedFrom,
 
-  // Solo Princess
-  SOLO_POOLS, SOLO_MODIFIERS,
-  SOLO_SUCKY_WARM, SOLO_SUCKY_BUILD, SOLO_SUCKY_OVER,
-  SOLO_WAND_WARM,  SOLO_WAND_BUILD,  SOLO_WAND_OVER,
-  SOLO_ZUMIO_WARM, SOLO_ZUMIO_BUILD, SOLO_ZUMIO_OVER
+  // Solo Princess (toy-specific pools + modifiers map)
+  SOLO_POOLS, SOLO_MODIFIERS
 } from "./tasks.js";
 
 /* ---------------- Preferences ---------------- */
@@ -62,22 +59,16 @@ function playChime(){
   }catch(e){}
 }
 
-/* ---------------- Helpers ---------------- */// engine.js
-
+/* ---------------- Helpers ---------------- */
 function resolveDuration(task, fallbackRange){
-  // task.dur can be a number or [min,max]
+  // Allow pool items to be strings or { text, dur } where dur is a number or [min,max]
   if (task && typeof task === "object" && "dur" in task){
     const d = task.dur;
     return Array.isArray(d) ? randInt(d[0], d[1]) : d;
   }
-  // fallback to the phase span if pool item was a plain string
   return randInt(fallbackRange[0], fallbackRange[1]);
 }
-
-function taskText(task){
-  return (typeof task === "string") ? task : task.text;
-}
-
+function taskText(task){ return (typeof task === "string") ? task : task.text; }
 function computeTotalRemain(fromIndex=0){
   return plan.slice(fromIndex).reduce((a,b)=> a + (b?.dur || 0), 0);
 }
@@ -92,7 +83,7 @@ function onTickFrame(){
 }
 function flashPhase(){
   els.phaseCard.classList.remove("phase-flash");
-  void els.phaseCard.offsetWidth;            // reflow
+  void els.phaseCard.offsetWidth;
   els.phaseCard.classList.add("phase-flash");
 }
 function pickWeighted(entries){
@@ -120,19 +111,12 @@ export function start(){
   log(`Session started (${MODE}, ${LENGTH})`, "info");
   startTicking();
 }
-
-export function pause(){
-  if(ticking){ stopTicking(); log("Paused","pause"); }
-  else { startTicking(); log("Resumed","resume"); }
-}
-
+export function pause(){ if(ticking){ stopTicking(); log("Paused","pause"); } else { startTicking(); log("Resumed","resume"); } }
 export function skip(){
   if(!plan[current]) return;
   log(`Skipped: ${(plan[current].kind?plan[current].kind+": ":"")}${plan[current].text}`, "skip");
-  skipCount++;
-  remain = 0.0001; // let step() advance on next tick
+  skipCount++; remain = 0.0001;
 }
-
 export function finishNow(){
   stopTicking();
   const f = choice(finisherPool);
@@ -205,7 +189,6 @@ function step(elapsedSec){
   current++;
 
   if(current >= plan.length){
-    // session complete
     const f = choice(finisherPool);
     finisherUsed = f || "Denied (Solo)";
     els.phase.textContent = "Finisher";
@@ -220,7 +203,6 @@ function step(elapsedSec){
     return;
   }
 
-  // move to next step
   remain = plan[current].dur + Math.max(0, -remain);
   render();
 }
@@ -238,9 +220,7 @@ function render(initial=false){
   }
 
   els.phase.textContent = step.phase;
-  els.task.textContent =
-    (step.toy ? `[${step.toy}] ` : "") +
-    step.text;
+  els.task.textContent = (step.toy ? `[${step.toy}] ` : "") + step.text;
 
   if(step.kind === "Rest") restCount++;
 
@@ -251,7 +231,6 @@ function render(initial=false){
   flashPhase();
   updateMeterAndTimes();
 }
-
 function updateMeterAndTimes(){
   const step = plan[current]; if(!step) return;
   const pct = Math.max(0, Math.min(1, remain / step.dur)) * 100;
@@ -287,9 +266,7 @@ function openSummary(){
     els.overlay?.classList.add("show");
   }
 }
-
 export function closeSummary(){ els.overlay.classList.remove("show"); }
-
 export function saveLog(){
   const lines = Array.from(els.log.children).map(n => n.textContent);
   const text = lines.join("\n");
@@ -370,17 +347,16 @@ function buildPrincessPlan(){
   return { plan: planOut, finisherPool: P_FINISH };
 }
 
-import { SOLO_POOLS, timesFor, choiceLimitedFrom, randInt } from "./tasks.js";
+/* ---------------- Solo Princess ---------------- */
 
-// ---- Weights for Solo Princess (higher = more likely) ----
+// Favor SUCKY across all phases
 const SOLO_WEIGHTS = {
   WARM:  { SUCKY: 6, WAND: 2, ZUMIO: 2 },
   BUILD: { SUCKY: 6, WAND: 2, ZUMIO: 2 },
   OVER:  { SUCKY: 6, WAND: 2, ZUMIO: 2 },
 };
-
 function pickToyForPhase(phase){
-  const m = SOLO_WEIGHTS[phase];                 // e.g. { SUCKY:7, WAND:2, ZUMIO:1 }
+  const m = SOLO_WEIGHTS[phase];
   const entries = Object.keys(m).map(k => ({ item: k, w: Number(m[k]) || 0 }));
   return pickWeighted(entries) || "SUCKY";
 }
@@ -402,8 +378,8 @@ function buildSoloPrincessPlan(){
   // Warm-up
   const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
   for(let i=0;i<warmRounds;i++){
-    const toy = pickToyForPhase("WARM");                 // SUCKY/WAND/ZUMIO (weighted)
-    const pool = SOLO_POOLS[toy].WARM;                   // array of {text,dur} or strings
+    const toy = pickToyForPhase("WARM");
+    const pool = SOLO_POOLS[toy].WARM;
     const pick = choiceLimitedFrom(`SOLO_WARM_${toy}`, pool);
     addStep("Warm-up", toy, pick, t.warmSpan);
 
@@ -435,46 +411,5 @@ function buildSoloPrincessPlan(){
 
   // Final Reset — denial
   out.push({ phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe.", dur:t.finalReset });
-  return { plan: out, finisherPool: [] };
-}
-
-
-
-  // Warm-up
-  const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
-  for(let i=0;i<warmRounds;i++){
-    const d = randInt(...t.warmSpan);
-    const toy = pickWeighted(warmWts);
-    const pool = (toy==="SUCKY") ? SOLO_SUCKY_WARM
-               : (toy==="WAND")  ? SOLO_WAND_WARM
-               :                   SOLO_ZUMIO_WARM;
-    addStep("Warm-up", toy, choiceLimitedFrom("SOLO_WARM_"+toy, pool), d);
-    const r = maybeRest(t.restWB, t.restProb); if(r) out.push({phase:"Warm-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
-  }
-
-  // Build-up
-  for(let i=0;i<t.buildCycles;i++){
-    const d = randInt(...t.buildSpan);
-    const toy = pickWeighted(buildWts);
-    const pool = (toy==="SUCKY") ? SOLO_SUCKY_BUILD
-               : (toy==="WAND")  ? SOLO_WAND_BUILD
-               :                   SOLO_ZUMIO_BUILD;
-    addStep("Build-up", toy, choiceLimitedFrom("SOLO_BUILD_"+toy, pool), d);
-    const r = maybeRest(t.restWB, t.restProb); if(r) out.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
-  }
-
-  // Overload
-  for(let i=0;i<t.overRounds;i++){
-    const d = randInt(...t.overSpan);
-    const toy = pickWeighted(overWts);
-    const pool = (toy==="SUCKY") ? SOLO_SUCKY_OVER
-               : (toy==="WAND")  ? SOLO_WAND_OVER
-               :                   SOLO_ZUMIO_OVER;
-    addStep("Cruel Overload", toy, choiceLimitedFrom("SOLO_OVER_"+toy, pool), d);
-    const r = maybeRest(t.restOver, t.restProb); if(r) out.push({phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r});
-  }
-
-  // Final reset — denial
-  out.push({phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe. You’re denied until Sir permits.", dur:t.finalReset});
   return { plan: out, finisherPool: [] };
 }
