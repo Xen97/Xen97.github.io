@@ -142,6 +142,6 @@
   </div>
 
   <!-- Load modules -->
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="./main.js?v=2"></script>
 </body>
 </html>
