@@ -7,18 +7,18 @@ export const D_WARM_PALM = [
 ];
 export const D_WARM_STROKE = [
   "Shallow strokes below the ridge — slow",
-  "Twist strokes — light twisting"
+  "Twist strokes"
 ];
 export const D_MID_PALM = [
-  "Thumb rub on head — tight circles",
-  "Cup and trap — palm cups the head, light rubbing",
+  "Thumb rub on head",
+  "Palm cups the head, light rubbing",
   "Normal Palming — steady rubbing of the head",
 ];
 export const D_MID_STROKE = [
-  "Two-finger straddle — stroke the head with two fingers either side",
-  "Base-to-tip drag — slow full strokes",
-  "Grip shift — 3 loose, 3 tight (repeat)",
-  "Twist strokes — slow twisting",
+  "Stroke the head with two fingers either side",
+  "Slow full strokes",
+  "Grip shift — 3 loose, 3 tight",
+  "Twist strokes",
   "Tight shallow strokes — firm squeeze below ridge"
 ];
 export const D_OVER_PALM = [
@@ -26,72 +26,71 @@ export const D_OVER_PALM = [
   "Slit Press — grind tight circles over the slit",
 ];
 export const D_OVER_STROKE = [
-  "Double Assault — shallow strokes under the ridge + palming",
-  "Tip Whip — shallow, rapid head strokes",
-  "Squeeze Stroke — progressively tighter downstrokes",
-  "Head Clamp Roll — trap the ridge and use tiny strokes"
+  "Shallow strokes under the ridge + palming",
+  "Shallow, rapid head strokes",
+  "Progressively tighter downstrokes",
+  "Trap the ridge and use tiny strokes"
 ];
 export const D_FINISH = [
-  "Vise-Grip Twist — clamp the head tight and twist through the climax",
-  "Hellgrind Lock — put thumb over the slit and rub tight circles, with small strokes to finish",
-  "Tip-Whip Burst — hold just below the ridge, very fast tip strokes through the release",
-  "Seal & Stroke — palm the head; other hand pounds short strokes"
+  "Clamp the head tight and twist through the climax",
+  "Put thumb over the slit and rub tight circles, with small strokes to finish",
+  "Hold just below the ridge, very fast tip strokes through the release",
+  "Palm the head; other hand pounds short strokes"
 ];
 
 /* ========= PRINCESS MODE (you act on her) ========= */
 export const P_WARM = [
-  "Outer lips only — two-fingers stroke outer lips",
-  "Sucky on clit at level 2 — steady, teasing pressure",
-  "Vibrator on clit at level 2–3 — slow circular motion",
-  "One finger gently rubbing her clit hood — don’t expose fully",
-  "Tongue slowly circling over the clit hood — very light contact",
-  "Two fingers pressing just inside the entrance — shallow and slow",
+  "Two-fingers stroke outer lips",
+  "Sucky on clit at level 4",
+  "Vibrator on clit at level 1",
+  "One finger gently rubbing her clit",
+  "Tongue slowly circling over the clit",
+  "Two fingers pressing just inside",
 ];
 export const P_BUILD = [
-  "Toy glide — run the vibrator up/down her slit",
-  "Sucky level 4 locked on clit while fingering slowly",
-  "Sucky level 5 pulsing on and off rhythmically",
-  "Vibrator level 4 pressed on clit while your fingers spread her open",
-  "Mouth sealed on clit — steady suction with occasional tongue flicks",
-  "Double assault — vibrator level 5 on clit while fingering",
-  "Edge climb — sucky from level 3 → 4 → 5, holding her just below release",
-  "Deep hooking — two fingers inside",
+  "Run the vibrator up/down her pussy",
+  "Sucky level 5 locked on clit while fingering slowly",
+  "Sucky level 6 pulsing on and off rhythmically",
+  "Vibrator level 2 pressed on clit while your fingers spread her open",
+  "Lick and suck her clit",
+  "Vibrator level 2 on clit while fingering",
+  "Sucky from level 3 → 4 → 5, holding her just below release",
+  "Two fingers inside",
 ];
 export const P_OVER = [
   "Thrash Assault — sucky level 8 tapping clit",
   "Relentless Suck-Lock — sucky level 7 sealed on her clit",
-  "Pinned Spread — two fingers fast, while vibrator level 6 grinds on clit",
-  "Tongue Torture — mouth suction on clit, fast tongue flicks, while fingering",
-  "Rolling Edge — sucky level 8, drop to 5 then back to 8, repeating",
-  "Edge Trap — rub her G-spot with 2 fingers while sucky level 7 stays on clit",
-  "Breaking Point — vibrator level 8 pressed to clit + full hand squeezing her lips"
+  "Vibrator level 3 on clit while fingering",
+  "Suck on clit while fingering",
+  "Sucky level 8, drop to 5 then back to 8",
+  "Sucky level 7 on clit while fingering",
+  "Vibrator level 3 pressed to clit"
 ];
 export const P_FINISH = [
-  "Clit Clamp — sucky level 8 pinned to clit",
-  "Double Pressure — two fingers curl hard on G-spot + sucky level 8 on clit",
-  "Grinding Lock — vibrator laid flat and ground firmly into clit",
-  "Pulse & Trap — sucky level 8 in bursts while fingering",
-  "Forced Lick Finish — pin her thighs; rapid tongue on clit + hard fingering"
+  "Your Favourite — sucky level 8 pinned to clit",
+  "Double Pressure — sucky level 8 on clit while fingering",
+  "Grinding Lock — Vibrator level 3 on clit while fingering",
+  "Forced Lick Finish — lick and suck clit + hard fingering"
 ];
 
 /* ========= SOLO PRINCESS (no internal fingering) ========= */
 /* Toy-specific pools; short, direct, fluid. */
 export const SOLO_SUCKY_WARM = [
   { text: "Put sucky on clit at level 4", dur: [120, 180] },
-  { text: "Pulse: seal briefly, lift briefly at Level 5", dur: [40, 70] },
+  { text: "Pulse: seal briefly, lift briefly at Level 5", dur: [80, 150] },
 ];
 export const SOLO_SUCKY_BUILD = [
   { text: "Put sucky on clit at level 5", dur: [100, 160] },
   { text: "Put sucky on clit at level 6", dur: [80, 140] },
 ];
 export const SOLO_SUCKY_OVER = [
-  { text: "Put sucky on clit at level 7", dur: [40, 80] },
-  { text: "Put sucky on clit at level 8", dur: [35, 70] },
+  { text: "Put sucky on clit at level 7", dur: [50, 80] },
+  { text: "Put sucky on clit at level 8", dur: [50, 70] },
 ];
 
 export const SOLO_WAND_WARM = [
-  { text: "Rest the wand just above clit, level 1", dur: [60, 180] },
-  { text: "Use the side of the wand head level 1", dur: [60, 180] },
+  { text: "Rest the wand just above clit, level 1", dur: [90, 180] },
+  { text: "Use the side of the wand head level 1", dur: [90, 180] },
 ];
 export const SOLO_WAND_BUILD = [
   { text: "Hold wand between thighs level 2", dur: [60, 120] },
@@ -99,9 +98,9 @@ export const SOLO_WAND_BUILD = [
   { text: "Hold on clit level 2", dur: [60, 110] },
 ];
 export const SOLO_WAND_OVER = [
+  { text: "Grind on wand level 3", dur: [70, 180] },
   { text: "Wand on clit, firm level 3", dur: [50, 80] },
   { text: "Hold wand between thighs level 3", dur: [50, 100] },
-  { text: "Push wand hard against clit level 3", dur: [50, 70] },
 ];
 
 export const SOLO_ZUMIO_WARM = [
