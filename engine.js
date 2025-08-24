@@ -246,6 +246,11 @@ export function applySoundButton(){
 export function setMode(m){ MODE=m; applyModeButtons(); log(`${MODE==="DOM"?"Dom":"Princess"} Mode selected`); }
 export function setLength(l){ LENGTH=l; applyLengthButtons(); log(`${LENGTH==="LONG"?"Long":"Short"} session selected`); }
 export function toggleSound(){ SOUND=!SOUND; applySoundButton(); log("Sound " + (SOUND ? "enabled" : "disabled")); }
+export function setSolo(on){
+  MODE = on ? "PRINCESS_SOLO" : "PRINCESS";
+  applyModeButtons();
+  log(`Mode → ${MODE}`);
+}
 
 function buildDomPlan(){
   const t = timesFor("DOM", LENGTH);
