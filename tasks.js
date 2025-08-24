@@ -1,4 +1,6 @@
-// tasks.js
+// tasks.js  — pools + timing + chooser helpers
+
+/* ========= DOM MODE (Princess acts on you) ========= */
 export const D_WARM_PALM = [
   "Flat palming over the head — slow circles",
   "Ridge orbit — fingertip circles under the ridge"
@@ -36,6 +38,7 @@ export const D_FINISH = [
   "Seal & Stroke — palm the head; other hand pounds short strokes"
 ];
 
+/* ========= PRINCESS MODE (you act on her) ========= */
 export const P_WARM = [
   "Outer lips only — two-fingers stroke outer lips",
   "Sucky on clit at level 2 — steady, teasing pressure",
@@ -70,9 +73,9 @@ export const P_FINISH = [
   "Pulse & Trap — sucky level 8 in bursts while fingering",
   "Forced Lick Finish — pin her thighs; rapid tongue on clit + hard fingering"
 ];
-      // --- SOLO PRINCESS (no fingering) ---
-// Toy-specific pools; short, direct, fluid.
 
+/* ========= SOLO PRINCESS (no internal fingering) ========= */
+/* Toy-specific pools; short, direct, fluid. */
 export const SOLO_SUCKY_WARM = [
   "Seal sucky on clit at level 2 — no movement",
   "Pulse: seal briefly, lift briefly — keep it gentle",
@@ -121,7 +124,7 @@ export const SOLO_ZUMIO_OVER = [
   "Pin and vibrate — no retreat"
 ];
 
-// Optional “say out loud” modifiers (sprinkled occasionally)
+/* Optional “say out loud” modifiers */
 export const SOLO_MODIFIERS = [
   "Say out loud: “I belong to Sir.”",
   "Whisper: “Thank you, Sir.”",
@@ -129,19 +132,17 @@ export const SOLO_MODIFIERS = [
   "Breathe out and count your breaths softly."
 ];
 
-// Convenience map so engine can grab by toy+phase
+/* Convenience map so engine can grab by toy+phase */
 export const SOLO_POOLS = {
   SUCKY: { WARM: SOLO_SUCKY_WARM, BUILD: SOLO_SUCKY_BUILD, OVER: SOLO_SUCKY_OVER },
   WAND:  { WARM: SOLO_WAND_WARM,  BUILD: SOLO_WAND_BUILD,  OVER: SOLO_WAND_OVER  },
   ZUMIO: { WARM: SOLO_ZUMIO_WARM, BUILD: SOLO_ZUMIO_BUILD, OVER: SOLO_ZUMIO_OVER }
 };
 
-    }
-  }
-}
+/* ========= Timing presets (moved here so engine can import) ========= */
 export function timesFor(mode, length){
-  if(mode==="DOM"){
-    return (length==="SHORT") ? {
+  if(mode === "DOM"){
+    return (length === "SHORT") ? {
       warmRounds:[2,3], buildCycles:3, overRounds:5,
       warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
       restWB:[10,18], restOver:[10,15], finalReset:60, restProb:0.15
@@ -150,8 +151,8 @@ export function timesFor(mode, length){
       warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
       restWB:[10,18], restOver:[10,15], finalReset:90, restProb:0.15
     };
-  } else {
-    if (length==="SHORT"){
+  } else { // PRINCESS/ SOLO
+    if(length === "SHORT"){
       return {
         warmRounds:[3,4], buildCycles:4, overRounds:6,
         warmSpan:[90,150], buildSpan:[90,150], overSpan:[120,210],
@@ -163,31 +164,35 @@ export function timesFor(mode, length){
         warmSpan:[90,150], buildSpan:[90,150], overSpan:[150,240],
         restWB:[15,25], restOver:[12,18], finalReset:150, restProb:0.08
       };
+    }
+  }
+}
 
-/* chooser helpers used by engine */
+/* ========= chooser + tiny utils ========= */
 export function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 export function choice(arr){ return arr[randInt(0, arr.length-1)]; }
 export function maybeRest(range, prob){ return Math.random() < prob ? randInt(range[0], range[1]) : 0; }
 
-let usageCounts={}, lastPick={};
-export function resetChooser(){ usageCounts={}; lastPick={}; }
+let usageCounts = {}, lastPick = {};
+export function resetChooser(){ usageCounts = {}; lastPick = {}; }
 export function choiceLimitedFrom(poolKey, arr){
-  if(!usageCounts[poolKey]) usageCounts[poolKey]={};
-  if(!lastPick[poolKey]) lastPick[poolKey]=null;
-  let tries=0;
-  while(tries<50){
+  if(!usageCounts[poolKey]) usageCounts[poolKey] = {};
+  if(!lastPick[poolKey]) lastPick[poolKey] = null;
+
+  let tries = 0;
+  while(tries < 50){
     const candidate = arr[randInt(0, arr.length-1)];
-    const used = usageCounts[poolKey][candidate]||0;
-    if(used<2 && candidate!==lastPick[poolKey]){
-      usageCounts[poolKey][candidate]=used+1;
-      lastPick[poolKey]=candidate;
+    const used = usageCounts[poolKey][candidate] || 0;
+    if(used < 2 && candidate !== lastPick[poolKey]){
+      usageCounts[poolKey][candidate] = used + 1;
+      lastPick[poolKey] = candidate;
       return candidate;
     }
     tries++;
   }
   const candidates = arr.filter(t => (usageCounts[poolKey][t]||0) < 2);
   const fallback = (candidates.length ? choice(candidates) : choice(arr));
-  usageCounts[poolKey][fallback]=(usageCounts[poolKey][fallback]||0)+1;
-  lastPick[poolKey]=fallback;
+  usageCounts[poolKey][fallback] = (usageCounts[poolKey][fallback]||0) + 1;
+  lastPick[poolKey] = fallback;
   return fallback;
 }
