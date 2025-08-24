@@ -372,51 +372,72 @@ function buildPrincessPlan(){
 
 import { SOLO_POOLS, timesFor, choiceLimitedFrom, randInt } from "./tasks.js";
 
-// assuming you have toy = "SUCKY" | "WAND" | "ZUMIO"
-function buildSoloPrincessPlan(toy, length){
-  const t = timesFor("PRINCESS", length);
-  const pools = SOLO_POOLS[toy];
-  const plan = [];
+// ---- Weights for Solo Princess (higher = more likely) ----
+const SOLO_WEIGHTS = {
+  WARM:  { SUCKY: 6, WAND: 2, ZUMIO: 2 },
+  BUILD: { SUCKY: 6, WAND: 2, ZUMIO: 2 },
+  OVER:  { SUCKY: 6, WAND: 2, ZUMIO: 2 },
+};
 
-  // Warm-up rounds
-  const warmRounds = choice(t.warmRounds);
-  for(let i=0; i<warmRounds; i++){
-    const pick = choiceLimitedFrom(`${toy}_WARM`, pools.WARM);
-    plan.push({
-      phase:"Warm-up",
-      toy,
-      text: `[${toy}] ${taskText(pick)}`,
-      dur: resolveDuration(pick, t.warmSpan),
-    });
-  }
-
-  // Build cycles
-  for(let i=0; i<t.buildCycles; i++){
-    const pick = choiceLimitedFrom(`${toy}_BUILD`, pools.BUILD);
-    plan.push({
-      phase:"Build-up",
-      toy,
-      text: `[${toy}] ${taskText(pick)}`,
-      dur: resolveDuration(pick, t.buildSpan),
-    });
-  }
-
-  // Over rounds
-  for(let i=0; i<t.overRounds; i++){
-    const pick = choiceLimitedFrom(`${toy}_OVER`, pools.OVER);
-    plan.push({
-      phase:"Cruel Overload",
-      toy,
-      text: `[${toy}] ${taskText(pick)}`,
-      dur: resolveDuration(pick, t.overSpan),
-    });
-  }
-
-  // Final Reset
-  plan.push({ phase:"Final Reset", toy, text:"No touch. Breathe.", dur:t.finalReset });
-
-  return plan;
+function pickToyForPhase(phase){
+  const m = SOLO_WEIGHTS[phase];                 // e.g. { SUCKY:7, WAND:2, ZUMIO:1 }
+  const entries = Object.keys(m).map(k => ({ item: k, w: Number(m[k]) || 0 }));
+  return pickWeighted(entries) || "SUCKY";
 }
+
+// Build a Solo plan with weighted toy selection + per-task durations
+function buildSoloPrincessPlan(){
+  const t = timesFor("PRINCESS", LENGTH);
+  const out = [];
+
+  const addStep = (phase, toy, pick, fallbackSpan) => {
+    out.push({
+      phase,
+      toy,
+      text: taskText(pick),
+      dur: resolveDuration(pick, fallbackSpan),
+    });
+  };
+
+  // Warm-up
+  const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
+  for(let i=0;i<warmRounds;i++){
+    const toy = pickToyForPhase("WARM");                 // SUCKY/WAND/ZUMIO (weighted)
+    const pool = SOLO_POOLS[toy].WARM;                   // array of {text,dur} or strings
+    const pick = choiceLimitedFrom(`SOLO_WARM_${toy}`, pool);
+    addStep("Warm-up", toy, pick, t.warmSpan);
+
+    const r = maybeRest(t.restWB, t.restProb);
+    if(r) out.push({ phase:"Warm-up", kind:"Rest", text:"No touch. Hold position.", dur:r });
+  }
+
+  // Build-up
+  for(let i=0;i<t.buildCycles;i++){
+    const toy = pickToyForPhase("BUILD");
+    const pool = SOLO_POOLS[toy].BUILD;
+    const pick = choiceLimitedFrom(`SOLO_BUILD_${toy}`, pool);
+    addStep("Build-up", toy, pick, t.buildSpan);
+
+    const r = maybeRest(t.restWB, t.restProb);
+    if(r) out.push({ phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r });
+  }
+
+  // Overload
+  for(let i=0;i<t.overRounds;i++){
+    const toy = pickToyForPhase("OVER");
+    const pool = SOLO_POOLS[toy].OVER;
+    const pick = choiceLimitedFrom(`SOLO_OVER_${toy}`, pool);
+    addStep("Cruel Overload", toy, pick, t.overSpan);
+
+    const r = maybeRest(t.restOver, t.restProb);
+    if(r) out.push({ phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r });
+  }
+
+  // Final Reset — denial
+  out.push({ phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe.", dur:t.finalReset });
+  return { plan: out, finisherPool: [] };
+}
+
 
 
   // Warm-up
