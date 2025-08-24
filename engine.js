@@ -110,6 +110,10 @@ function step(elapsedSec){
 function render(initial=false){
   const step = plan[current];
   if(!step) return;
+els.task.textContent =
+  (step.kind?step.kind+": ":"") +
+  (step.toy ? `[${step.toy}] ` : "") +
+  step.text;
 
   if(step.phase !== prevPhase){
     addDivider(step.phase);
