@@ -224,7 +224,6 @@ function render(initial=false){
 
   els.phase.textContent = step.phase;
   els.task.textContent =
-    (step.kind ? step.kind + ": " : "") +
     (step.toy ? `[${step.toy}] ` : "") +
     step.text;
 
