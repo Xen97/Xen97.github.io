@@ -77,51 +77,45 @@ export const P_FINISH = [
 /* ========= SOLO PRINCESS (no internal fingering) ========= */
 /* Toy-specific pools; short, direct, fluid. */
 export const SOLO_SUCKY_WARM = [
-  "Seal sucky on clit at level 2 — no movement",
-  "Pulse: seal briefly, lift briefly — keep it gentle",
-  "Hover just above clit, then seal softly — tease the seal"
+  { text: "Put sucky on clit at level 4", dur: [120, 180] },
+  { text: "Pulse: seal briefly, lift briefly at Level 5", dur: [40, 60] },
 ];
 export const SOLO_SUCKY_BUILD = [
-  "Seal tight at level 3–4 — hands still",
-  "Hold the seal and breathe — ride the pull",
-  "Re-seal if it slips — keep pressure constant"
+  { text: "Put sucky on clit at level 5", dur: [100, 160] },
+  { text: "Put sucky on clit at level 6", dur: [80, 140] },
 ];
 export const SOLO_SUCKY_OVER = [
-  "Lock level 4 and don’t move it",
-  "Press harder into the seal — no mercy",
-  "Hold the seal through every twitch — do not back off"
+  { text: "Put sucky on clit at level 7", dur: [30, 70] },
+  { text: "Put sucky on clit at level 8", dur: [20, 50] },
 ];
 
 export const SOLO_WAND_WARM = [
-  "Rest the wand just above clit, low power",
-  "Use the side of the wand head — feather-light",
-  "Flat contact but soft pressure — stay gentle"
+  { text: "Rest the wand just above clit, level 1", dur: [60, 180] },
+  { text: "Use the side of the wand head level 1", dur: [60, 180] },
 ];
 export const SOLO_WAND_BUILD = [
-  "Clamp wand flat at medium — no grinding",
-  "Rock the wand side-to-side slowly",
-  "Hold steady and let the throb do it"
+  { text: "Hold wand between thighs level 2", dur: [30, 120] },
+  { text: "Grind on wand level 2", dur: [50, 120] },
+  { text: "Hold on clit level 2" dur: [40, 110] },
 ];
 export const SOLO_WAND_OVER = [
-  "Press the wand flat, firmer — do not ease up",
-  "Pin her clit — steady, unbroken pressure",
-  "Hold through the urge to move — stay locked"
+  { text: "Wand on clit, firm level 3", dur: [20, 70] },
+  { text: "Hold wand between thighs level 3", dur: [20, 90] },
+  { text: "Push wand hard against clit level 3" dur: [20, 60] },
 ];
 
 export const SOLO_ZUMIO_WARM = [
-  "Trace tiny circles around the clit hood only",
-  "Draw figure-8s around, never direct contact",
-  "Skim the edge of the hood — barely touching"
+  { text: "Trace tiny circles around the clit hood only", dur: [20, 60] },
+  { text: "Drag toy from below clit up and over", dur: [20, 40] },
+  { text: "Skim the edge of the hood — barely touching" dur: [20, 60] },
 ];
 export const SOLO_ZUMIO_BUILD = [
-  "Pinpoint on one side of clit — steady contact",
-  "Tiny fast circles on the hood’s edge",
-  "Slow spiral inward — stop at the edge"
+  { text: "Pinpoint on one side of clit", dur: [20, 60] },
+  { text: "Tiny fast circles on the clit", dur: [20, 40] },
 ];
 export const SOLO_ZUMIO_OVER = [
-  "Hard pinpoint to the same spot — unflinching",
-  "Hold the tip firm — micro-circles only",
-  "Pin and vibrate — no retreat"
+  { text: "Spread pussy and hold toy on clit", dur: [15, 45] },
+  { text: "Hold the tip firm — micro-circles only", dur: [20, 40] },
 ];
 
 /* Optional “say out loud” modifiers */
