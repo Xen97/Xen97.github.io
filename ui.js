@@ -13,7 +13,7 @@ export const els = {
   saveLogBtn: $("#saveLogBtn"),
   restartBtn: $("#restartBtn"),
   closeSummaryBtn: $("#closeSummaryBtn"),
-  soloBtn: document.getElementById("soloBtn"),
+  soloBtn: $("soloBtn"),
 
 
   modeTag: $("#modeTag"),
