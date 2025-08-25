@@ -356,9 +356,9 @@ function buildPrincessPlan(){
 
 // Favor SUCKY across all phases
 const SOLO_WEIGHTS = {
-  WARM:  { SUCKY: 4, WAND: 2, ZUMIO: 2 },
-  BUILD: { SUCKY: 4, WAND: 2, ZUMIO: 2 },
-  OVER:  { SUCKY: 4, WAND: 2, ZUMIO: 2 },
+  WARM:  { SUCKY: 5, WAND: 2, ZUMIO: 2 },
+  BUILD: { SUCKY: 5, WAND: 2, ZUMIO: 2 },
+  OVER:  { SUCKY: 5, WAND: 2, ZUMIO: 2 },
 };
 function pickToyForPhase(phase){
   const m = SOLO_WEIGHTS[phase];
