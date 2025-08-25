@@ -1,5 +1,5 @@
 // main.js
-import { els, LS_KEYS } from "./ui.js";
+import { els, LS_KEYS } from "./engine.js";
 import {
   start, pause, skip, finishNow,
   applyModeButtons, applyLengthButtons, applySoundButton,
