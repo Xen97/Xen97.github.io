@@ -71,4 +71,4 @@ function boot() {
 }
 
 // Only call boot once, when DOM is ready
-document.addEvent
+document.addEventListener("DOMContentLoaded", boot);
