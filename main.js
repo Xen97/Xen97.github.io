@@ -76,7 +76,6 @@ function wireControls() {
 
   setupEasterEgg(els.princessBtn);
 
-function boot(){
   applyModeButtons();
   applyLengthButtons();
   applySoundButton();
@@ -85,7 +84,6 @@ function boot(){
   els.task.textContent = "Ready when you are.";
   els.clock.textContent = "00:00";
   els.eta.textContent = "~— left";
-
-  wireControls();
 }
+  wireControls();
 boot();
