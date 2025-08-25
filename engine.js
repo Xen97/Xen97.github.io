@@ -154,20 +154,23 @@ export function toggleSound(){
 }
 
 /* ---------------- UI sync ---------------- */
-export function applyModeButtons(){
-  setPrimary(els.domBtn, MODE==="DOM");
-  setPrimary(els.princessBtn, MODE==="PRINCESS" || MODE==="PRINCESS_SOLO");
-  setModeTag(MODE==="DOM" ? "DOM" : "PRINCESS");
+export function applyModeButtons() {
+  setPrimary(els.domBtn,       MODE === "DOM");
+  setPrimary(els.princessBtn,  MODE === "PRINCESS" || MODE === "PRINCESS_SOLO");
+  setPrimary(els.soloBtn,      MODE === "PRINCESS_SOLO"); // <-- new
 
-  if(MODE==="DOM"){
-    document.documentElement.style.setProperty("--accent","var(--accentDom)");
-    document.documentElement.style.setProperty("--accentGlow","rgba(155,89,182,.18)");
+  setModeTag(MODE === "DOM" ? "DOM" : "PRINCESS");
+
+  if (MODE === "DOM") {
+    document.documentElement.style.setProperty("--accent", "var(--accentDom)");
+    document.documentElement.style.setProperty("--accentGlow", "rgba(155,89,182,.18)");
   } else {
-    document.documentElement.style.setProperty("--accent","var(--accentPrincess)");
-    document.documentElement.style.setProperty("--accentGlow","rgba(230,102,102,.18)");
+    document.documentElement.style.setProperty("--accent", "var(--accentPrincess)");
+    document.documentElement.style.setProperty("--accentGlow", "rgba(230,102,102,.18)");
   }
   localStorage.setItem(LS_KEYS.MODE, MODE);
 }
+
 export function applyLengthButtons(){
   setPrimary(els.shortBtn, LENGTH==="SHORT");
   setPrimary(els.longBtn,  LENGTH==="LONG");
