@@ -62,6 +62,14 @@ export function addDivider(label){
   els.log.appendChild(div);
   els.log.scrollTop = els.log.scrollHeight;
 }
+export function setPrimary(btn, on){
+  if (!btn) return;                              // null-safe
+  btn.classList.toggle("primary", !!on);
+  if (btn.classList.contains("ghost")) {         // remove ghost when active
+    btn.classList.toggle("ghost", !on);
+  }
+  btn.setAttribute("aria-pressed", on ? "true" : "false");
+}
 
 export function setPrimary(btn, on){
   btn.classList.toggle("primary", !!on);
