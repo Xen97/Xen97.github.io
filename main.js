@@ -7,18 +7,24 @@ import {
 } from "./engine.js";
 import { setupEasterEgg } from "./easteregg.js";
 
-// optional: guard if you hide the button in some modes
-els.soloBtn?.addEventListener("click", ()=>{
-  const on = (MODE !== "PRINCESS_SOLO");
-  setSolo(on);
-  els.soloBtn.classList.toggle("toggled", on);
-  els.soloBtn.setAttribute("aria-pressed", on ? "true" : "false");
-});
-
 function wireControls(){
   // Mode/length/sound
-  els.domBtn.addEventListener("click", ()=> setMode("DOM"));
-  els.princessBtn.addEventListener("click", ()=> setMode("PRINCESS"));
+els.domBtn.addEventListener("click", () => {
+  MODE = "DOM";
+  applyModeButtons();
+});
+
+els.princessBtn.addEventListener("click", () => {
+  MODE = "PRINCESS";
+  applyModeButtons();
+});
+
+els.soloBtn.addEventListener("click", () => {
+  // Solo is a sub-mode of Princess
+  MODE = (MODE === "PRINCESS_SOLO") ? "PRINCESS" : "PRINCESS_SOLO";
+  applyModeButtons();
+});
+
   els.shortBtn.addEventListener("click", ()=> setLength("SHORT"));
   els.longBtn.addEventListener("click", ()=> setLength("LONG"));
   els.soundBtn.addEventListener("click", toggleSound);
