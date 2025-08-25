@@ -7,7 +7,7 @@
 <style>
   /* ——— your entire existing CSS exactly as you have it now ——— */
   :root{ --bg:#0f1115; --fg:#e6e6e6; --muted:#aab;
-    --accentPrincess:#F477DD; --accentDom:#9b59b6; --accent:var(--accentPrincess);
+    --accentPrincess:#F477DD; --accentDom:#55C865; --accent:var(--accentPrincess);
     --accentGlow:rgba(230,102,102,.18); --card:#171a21; --border:#232738; --btn:#1b1f2e; --btn-border:#2a2f44;
   }
   *{box-sizing:border-box;}
