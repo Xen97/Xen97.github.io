@@ -70,11 +70,6 @@ export function setPrimary(btn, on){
   }
   btn.setAttribute("aria-pressed", on ? "true" : "false");
 }
-
-export function setPrimary(btn, on){
-  btn.classList.toggle("primary", !!on);
-  btn.setAttribute("aria-pressed", on ? "true" : "false");
-}
 export function setModeTag(mode){
   els.modeTag.textContent = mode === "DOM" ? "Dom Mode" : "Princess Mode";
 }
