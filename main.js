@@ -1,5 +1,5 @@
 // main.js
-import { els } from "./ui.js";
+import { els, LS_KEYS } from "./ui.js";
 import {
   start, pause, skip, finishNow,
   applyModeButtons, applyLengthButtons, applySoundButton,
@@ -7,23 +7,46 @@ import {
 } from "./engine.js";
 import { setupEasterEgg } from "./easteregg.js";
 
-function wireControls(){
-  // Mode/length/sound
-els.domBtn.addEventListener("click", () => {
-  MODE = "DOM";
-  applyModeButtons();
-});
+// ---- BOOT ----
+function boot() {
+  // Restore MODE from storage (normalize to one of the three)
+  const stored = localStorage.getItem(LS_KEYS.MODE);
+  const normalized = (stored === "DOM" || stored === "PRINCESS" || stored === "PRINCESS_SOLO")
+    ? stored
+    : "PRINCESS";
 
-els.princessBtn.addEventListener("click", () => {
-  MODE = "PRINCESS";
-  applyModeButtons();
-});
+  setMode(normalized);      // <- set state first
+  applyModeButtons();       // <- then sync UI
 
-els.soloBtn.addEventListener("click", () => {
-  // Solo is a sub-mode of Princess
-  MODE = (MODE === "PRINCESS_SOLO") ? "PRINCESS" : "PRINCESS_SOLO";
-  applyModeButtons();
-});
+  wireControls();           // attach click handlers AFTER initial UI is in place
+  setupEasterEgg?.();
+}
+
+document.addEventListener("DOMContentLoaded", boot);
+
+// ---- EVENTS ----
+function wireControls() {
+  // Mode
+  els.domBtn.addEventListener("click", () => {
+    setMode("DOM");
+    applyModeButtons();
+  });
+
+  els.princessBtn.addEventListener("click", () => {
+    setMode("PRINCESS");
+    applyModeButtons();
+  });
+
+  els.soloBtn.addEventListener("click", () => {
+    // toggle solo sub-mode of Princess
+    const next = (MODE === "PRINCESS_SOLO") ? "PRINCESS" : "PRINCESS_SOLO";
+    setMode(next);
+    applyModeButtons();
+  });
+
+  // …your other listeners (length/sound/etc)
+}
+
 
   els.shortBtn.addEventListener("click", ()=> setLength("SHORT"));
   els.longBtn.addEventListener("click", ()=> setLength("LONG"));
