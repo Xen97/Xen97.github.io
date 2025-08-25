@@ -2,40 +2,42 @@
 
 /* ========= DOM MODE (Princess acts on you) ========= */
 export const D_WARM_PALM = [
-  "Flat palming over the head — slow circles",
-  "Ridge orbit — fingertip circles under the ridge"
+  { text: "Flat palming over the head — slow circles", dur: [40, 65] },
+  { text: "Thumb rubs underside of head", dur: [40, 65] },
 ];
 export const D_WARM_STROKE = [
-  "Shallow strokes below the ridge — slow",
-  "Twist strokes"
+  { text: "Shallow strokes below the ridge — slow", dur: [40, 65] },
+  { text: "Twist strokes", dur: [40, 65] },
 ];
 export const D_MID_PALM = [
-  "Thumb rub on head",
-  "Palm cups the head, light rubbing",
-  "Normal Palming — steady rubbing of the head",
+  { text: "Thumb rub on head", dur: [55, 80] },
+  { text: "Thumb rubs underside of head", dur: [55, 90] },
+  { text: "Palm cups the head, light rubbing", dur: [40, 70] },
+  { text: "Normal Palming — steady rubbing of the head", dur: [60, 130] },
 ];
 export const D_MID_STROKE = [
-  "Stroke the head with two fingers either side",
-  "Slow full strokes",
-  "Grip shift — 3 loose, 3 tight",
-  "Twist strokes",
-  "Tight shallow strokes — firm squeeze below ridge"
+  { text: "Stroke the head with two fingers either side", dur: [40, 70] },
+  { text: "Slow full strokes", dur: [40, 70] },
+  { text: "Grip shift — 3 loose, 3 tight", dur: [40, 70] },
+  { text: "Twist strokes", dur: [30, 70] },
+  { text: "Tight shallow strokes — firm squeeze below ridge", dur: [30, 70] },
 ];
 export const D_OVER_PALM = [
-  "Normal Palming — steady rubbing of the head",
-  "Slit Press — grind tight circles over the slit",
+  { text: "Normal Palming — steady rubbing of the head", dur: [90, 240] },
+  { text: "Slit Press — grind tight circles over the slit", dur: [50, 120] },
 ];
 export const D_OVER_STROKE = [
-  "Shallow strokes under the ridge + palming",
-  "Shallow, rapid head strokes",
-  "Progressively tighter downstrokes",
-  "Trap the ridge and use tiny strokes"
+  { text: "Shallow strokes under the ridge + palming", dur: [20, 40] },
+  { text: "Shallow, rapid head strokes", dur: [20, 50] },
+  { text: "Progressively tighter downstrokes", dur: [40, 90] },
+  { text: "Trap the ridge and use tiny strokes", dur: [30, 50] },
 ];
 export const D_FINISH = [
   "Clamp the head tight and twist through the climax",
   "Put thumb over the slit and rub tight circles, with small strokes to finish",
   "Hold just below the ridge, very fast tip strokes through the release",
-  "Palm the head; other hand pounds short strokes"
+  "Palm the head; other hand pounds short strokes",
+  "Twisting strokes up and down the head",
 ];
 
 /* ========= PRINCESS MODE (you act on her) ========= */
@@ -46,6 +48,8 @@ export const P_WARM = [
   "One finger gently rubbing her clit",
   "Tongue slowly circling over the clit",
   "Two fingers pressing just inside",
+  "Slide your cock between her lips, teasing her clit without going inside",
+  "Just the tip — press your cock against her entrance, sliding slowly in/out a little",
 ];
 export const P_BUILD = [
   "Run the vibrator up/down her pussy",
@@ -56,6 +60,7 @@ export const P_BUILD = [
   "Vibrator level 2 on clit while fingering",
   "Sucky from level 3 → 4 → 5, holding her just below release",
   "Two fingers inside",
+  "Slow, deep strokes while sucky teases her clit",
 ];
 export const P_OVER = [
   "Thrash Assault — sucky level 8 tapping clit",
@@ -64,7 +69,8 @@ export const P_OVER = [
   "Suck on clit while fingering",
   "Sucky level 8, drop to 5 then back to 8",
   "Sucky level 7 on clit while fingering",
-  "Vibrator level 3 pressed to clit"
+  "Vibrator level 3 pressed to clit",
+  "Hard, fast thrusts while sucky sealed on clit",
 ];
 export const P_FINISH = [
   "Your Favourite — sucky level 8 pinned to clit",
@@ -86,6 +92,7 @@ export const SOLO_SUCKY_BUILD = [
 export const SOLO_SUCKY_OVER = [
   { text: "Put sucky on clit at level 7", dur: [50, 80] },
   { text: "Put sucky on clit at level 8", dur: [50, 70] },
+  { text: "Put sucky on clit at level 8 hold in place squeezing thighs together", dur: [60, 90] },
 ];
 
 export const SOLO_WAND_WARM = [
@@ -122,7 +129,6 @@ export const SOLO_MODIFIERS = [
   "Say out loud: “I belong to Sir.”",
   "Whisper: “Thank you, Sir.”",
   "Say: “I wish Sir was here watching me.”",
-  "Breathe out and count your breaths softly."
 ];
 
 /* Convenience map so engine can grab by toy+phase */
@@ -140,7 +146,7 @@ export function timesFor(mode, length){
       warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
       restWB:[10,18], restOver:[10,15], finalReset:60, restProb:0.15
     } : {
-      warmRounds:[3,4], buildCycles:6, overRounds:9,
+      warmRounds:[2,3], buildCycles:6, overRounds:9,
       warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
       restWB:[10,18], restOver:[10,15], finalReset:90, restProb:0.15
     };
