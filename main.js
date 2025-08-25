@@ -75,7 +75,6 @@ function wireControls() {
   });
 
   setupEasterEgg(els.princessBtn);
-}
 
 function boot(){
   applyModeButtons();
