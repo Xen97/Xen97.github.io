@@ -84,6 +84,6 @@ function wireControls() {
   els.task.textContent = "Ready when you are.";
   els.clock.textContent = "00:00";
   els.eta.textContent = "~— left";
-}
+
   wireControls();
 boot();
