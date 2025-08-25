@@ -157,7 +157,9 @@ export function toggleSound(){
 export function applyModeButtons() {
   setPrimary(els.domBtn,       MODE === "DOM");
   setPrimary(els.princessBtn,  MODE === "PRINCESS" || MODE === "PRINCESS_SOLO");
-  setPrimary(els.soloBtn,      MODE === "PRINCESS_SOLO"); // <-- new
+  setPrimary(els.soloBtn, MODE === "PRINCESS_SOLO");
+els.soloBtn.classList.toggle("ghost", MODE !== "PRINCESS_SOLO"); // <-- ensure not ghost when active
+
 
   setModeTag(MODE === "DOM" ? "DOM" : "PRINCESS");
 
