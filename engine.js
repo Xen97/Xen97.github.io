@@ -98,6 +98,12 @@ function pickWeighted(entries){
 export function start(){
   resetChooser();
   current = 0; completedSteps = 0; restCount = 0; skipCount = 0; finisherUsed = "—"; prevPhase = "";
+  
+const r = (MODE === "DOM")
+  ? buildDomPlan()
+  : (MODE === "PRINCESS_SOLO")
+    ? buildSoloPrincessPlan()
+    : buildPrincessPlan();
 
   const r = Mode();
   plan = r.plan;
