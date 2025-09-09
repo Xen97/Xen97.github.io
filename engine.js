@@ -99,7 +99,7 @@ export function start(){
   resetChooser();
   current = 0; completedSteps = 0; restCount = 0; skipCount = 0; finisherUsed = "—"; prevPhase = "";
 
-  const r = Mode();
+  const r = buildPlanForMode();   // <-- fix
   plan = r.plan;
   finisherPool = r.finisherPool;
 
