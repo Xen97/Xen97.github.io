@@ -298,28 +298,28 @@ function buildDomPlan(){
 
   for(let i=0;i<warmRounds;i++){
     const d = randInt(...t.warmSpan);
-    planOut.push({phase:"Warm-up", kind:"Palming",  text:choiceLimitedFrom("D_WARM_PALM",   D_WARM_PALM),   dur:d});
+    planOut.push({phase:"Warm-up", kind:"Palming",  text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),   dur:d});
     const r1=maybeRest(t.restWB,t.restProb); if(r1) planOut.push({phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1});
-    planOut.push({phase:"Warm-up", kind:"Stroking", text:choiceLimitedFrom("D_WARM_STROKE", D_WARM_STROKE), dur:d});
+    planOut.push({phase:"Warm-up", kind:"Stroking", text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:d});
     const r2=maybeRest(t.restWB,t.restProb); if(r2) planOut.push({phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
   }
 
   for(let i=0;i<t.buildCycles;i++){
     const d = randInt(...t.buildSpan);
-    planOut.push({phase:"Mid Build-up", kind:`Palming ${i+1}`,  text:choiceLimitedFrom("D_MID_PALM",  D_MID_PALM),  dur:d});
+    planOut.push({phase:"Mid Build-up", kind:`Palming ${i+1}`,  text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),  dur:d});
     const r1=maybeRest(t.restWB,t.restProb); if(r1) planOut.push({phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1});
-    planOut.push({phase:"Mid Build-up", kind:`Stroking ${i+1}`, text:choiceLimitedFrom("D_MID_STROKE",D_MID_STROKE),dur:d});
+    planOut.push({phase:"Mid Build-up", kind:`Stroking ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),dur:d});
     const r2=maybeRest(t.restWB,t.restProb); if(r2) planOut.push({phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
   }
 
   for(let i=0;i<t.overRounds;i++){
     const pd=randInt(...t.overPalm);
     const palmingPool = D_OVER_PALM.concat(D_OVER_PALM);
-    planOut.push({phase:"Cruel Overload", kind:`Overload Palming ${i+1}`, text:choiceLimitedFrom("D_OVER_PALM", palmingPool), dur:pd});
+    planOut.push({phase:"Cruel Overload", kind:`Overload Palming ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:pd});
     const r1=maybeRest(t.restOver,t.restProb); if(r1) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r1});
 
     const sd=randInt(...t.overStroke);
-    planOut.push({phase:"Cruel Overload", kind:`Overload Stroking ${i+1}`, text:choiceLimitedFrom("D_OVER_STROKE", D_OVER_STROKE), dur:sd});
+    planOut.push({phase:"Cruel Overload", kind:`Overload Stroking ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:sd});
     const r2=maybeRest(t.restOver,t.restProb); if(r2) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
   }
 
@@ -334,17 +334,17 @@ function buildPrincessPlan(){
 
   for(let i=0;i<warmRounds;i++){
     const d = randInt(...t.warmSpan);
-    planOut.push({phase:"Warm-up",  kind:`Warm ${i+1}`,  text:choiceLimitedFrom("P_WARM",  P_WARM),  dur:d});
+    planOut.push({phase:"Warm-up",  kind:`Warm ${i+1}`,  text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),  dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) planOut.push({phase:"Warm-up",  kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
   for(let i=0;i<t.buildCycles;i++){
     const d = randInt(...t.buildSpan);
-    planOut.push({phase:"Build-up", kind:`Build ${i+1}`, text:choiceLimitedFrom("P_BUILD", P_BUILD), dur:d});
+    planOut.push({phase:"Build-up", kind:`Build ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) planOut.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
   for(let i=0;i<t.overRounds;i++){
     const d = randInt(...t.overSpan);
-    planOut.push({phase:"Cruel Overload", kind:`Overload ${i+1}`, text:choiceLimitedFrom("P_OVER",  P_OVER),  dur:d});
+    planOut.push({phase:"Cruel Overload", kind:`Overload ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),  dur:d});
     const r=maybeRest(t.restOver,t.restProb); if(r) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
 
