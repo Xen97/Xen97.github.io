@@ -99,7 +99,7 @@ export function start(){
   resetChooser();
   current = 0; completedSteps = 0; restCount = 0; skipCount = 0; finisherUsed = "—"; prevPhase = "";
 
-  const r = buildPlanForMode();
+  const r = Mode();
   plan = r.plan;
   finisherPool = r.finisherPool;
 
@@ -442,3 +442,10 @@ function buildSoloPrincessPlan(){
   out.push({ phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe.", dur:t.finalReset });
   return { plan: out, finisherPool: [] };
 }
+// Pick the correct plan based on MODE
+function buildPlanForMode(){
+  if (MODE === "DOM") return buildDomPlan();
+  if (MODE === "PRINCESS_SOLO") return buildSoloPrincessPlan();
+  return buildPrincessPlan(); // default
+}
+
