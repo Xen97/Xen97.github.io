@@ -358,17 +358,17 @@ function buildPrincessPlan(){
 
   for(let i=0;i<warmRounds;i++){
     const d = randInt(...t.warmSpan);
-    planOut.push({phase:"Warm-up",  kind:`Warm ${i+1}`,  text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),  dur:d});
+    planOut.push({phase:"Warm-up",  kind:`Warm ${i+1}`,  text: taskText(choiceLimitedFrom("P_WARM", P_WARM)),  dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) planOut.push({phase:"Warm-up",  kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
   for(let i=0;i<t.buildCycles;i++){
     const d = randInt(...t.buildSpan);
-    planOut.push({phase:"Build-up", kind:`Build ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:d});
+    planOut.push({phase:"Build-up", kind:`Build ${i+1}`, text: taskText(choiceLimitedFrom("P_BUILD", P_BUILD)), dur:d});
     const r=maybeRest(t.restWB,t.restProb); if(r) planOut.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
   for(let i=0;i<t.overRounds;i++){
     const d = randInt(...t.overSpan);
-    planOut.push({phase:"Cruel Overload", kind:`Overload ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),  dur:d});
+    planOut.push({phase:"Cruel Overload", kind:`Overload ${i+1}`, text: taskText(choiceLimitedFrom("P_OVER", P_OVER)),  dur:d});
     const r=maybeRest(t.restOver,t.restProb); if(r) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r});
   }
 
