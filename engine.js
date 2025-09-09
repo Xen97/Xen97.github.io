@@ -285,47 +285,71 @@ export function saveLog(){
 }
 
 /* ---------------- Plan builders ---------------- */
-function buildPlanForMode(){
-  if (MODE === "DOM") return buildDomPlan();
-  if (MODE === "PRINCESS_SOLO") return buildSoloPrincessPlan();
-  return buildPrincessPlan();
-}
-
 function buildDomPlan(){
   const t = timesFor("DOM", LENGTH);
   const planOut = [];
   const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
 
-  for(let i=0;i<warmRounds;i++){
+  // Warm-up
+  for (let i = 0; i < warmRounds; i++){
     const d = randInt(...t.warmSpan);
-    planOut.push({phase:"Warm-up", kind:"Palming",  text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),   dur:d});
-    const r1=maybeRest(t.restWB,t.restProb); if(r1) planOut.push({phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1});
-    planOut.push({phase:"Warm-up", kind:"Stroking", text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:d});
-    const r2=maybeRest(t.restWB,t.restProb); if(r2) planOut.push({phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
+    planOut.push({
+      phase:"Warm-up", kind:"Palming",
+      text: taskText(choiceLimitedFrom("D_WARM_PALM", D_WARM_PALM)), dur:d
+    });
+    const r1 = maybeRest(t.restWB, t.restProb);
+    if (r1) planOut.push({ phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1 });
+
+    planOut.push({
+      phase:"Warm-up", kind:"Stroking",
+      text: taskText(choiceLimitedFrom("D_WARM_STROKE", D_WARM_STROKE)), dur:d
+    });
+    const r2 = maybeRest(t.restWB, t.restProb);
+    if (r2) planOut.push({ phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2 });
   }
 
-  for(let i=0;i<t.buildCycles;i++){
+  // Mid build-up
+  for (let i = 0; i < t.buildCycles; i++){
     const d = randInt(...t.buildSpan);
-    planOut.push({phase:"Mid Build-up", kind:`Palming ${i+1}`,  text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),  dur:d});
-    const r1=maybeRest(t.restWB,t.restProb); if(r1) planOut.push({phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1});
-    planOut.push({phase:"Mid Build-up", kind:`Stroking ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)),dur:d});
-    const r2=maybeRest(t.restWB,t.restProb); if(r2) planOut.push({phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
+    planOut.push({
+      phase:"Mid Build-up", kind:`Palming ${i+1}`,
+      text: taskText(choiceLimitedFrom("D_MID_PALM", D_MID_PALM)), dur:d
+    });
+    const r1 = maybeRest(t.restWB, t.restProb);
+    if (r1) planOut.push({ phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1 });
+
+    planOut.push({
+      phase:"Mid Build-up", kind:`Stroking ${i+1}`,
+      text: taskText(choiceLimitedFrom("D_MID_STROKE", D_MID_STROKE)), dur:d
+    });
+    const r2 = maybeRest(t.restWB, t.restProb);
+    if (r2) planOut.push({ phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2 });
   }
 
-  for(let i=0;i<t.overRounds;i++){
-    const pd=randInt(...t.overPalm);
-    const palmingPool = D_OVER_PALM.concat(D_OVER_PALM);
-    planOut.push({phase:"Cruel Overload", kind:`Overload Palming ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:pd});
-    const r1=maybeRest(t.restOver,t.restProb); if(r1) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r1});
+  // Overload
+  for (let i = 0; i < t.overRounds; i++){
+    const pd = randInt(...t.overPalm);
+    const palmingPool = D_OVER_PALM.concat(D_OVER_PALM); // bias to palming
+    planOut.push({
+      phase:"Cruel Overload", kind:`Overload Palming ${i+1}`,
+      text: taskText(choiceLimitedFrom("D_OVER_PALM", palmingPool)), dur:pd
+    });
+    const r1 = maybeRest(t.restOver, t.restProb);
+    if (r1) planOut.push({ phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r1 });
 
-    const sd=randInt(...t.overStroke);
-    planOut.push({phase:"Cruel Overload", kind:`Overload Stroking ${i+1}`, text: taskText(choiceLimitedFrom("POOL_KEY", POOL_ARRAY)), dur:sd});
-    const r2=maybeRest(t.restOver,t.restProb); if(r2) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r2});
+    const sd = randInt(...t.overStroke);
+    planOut.push({
+      phase:"Cruel Overload", kind:`Overload Stroking ${i+1}`,
+      text: taskText(choiceLimitedFrom("D_OVER_STROKE", D_OVER_STROKE)), dur:sd
+    });
+    const r2 = maybeRest(t.restOver, t.restProb);
+    if (r2) planOut.push({ phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r2 });
   }
 
-  planOut.push({phase:"Final Reset", kind:"Final reset", text:"Hands off. Breathe.", dur:t.finalReset});
+  planOut.push({ phase:"Final Reset", kind:"Final reset", text:"Hands off. Breathe.", dur:t.finalReset });
   return { plan: planOut, finisherPool: D_FINISH };
 }
+
 
 function buildPrincessPlan(){
   const t = timesFor("PRINCESS", LENGTH);
