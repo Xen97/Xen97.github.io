@@ -6,93 +6,81 @@ export const D_WARM_PALM = [
   { text: "Thumb rubs underside of head", dur: [40, 65] },
 ];
 export const D_WARM_STROKE = [
-  { text: "Shallow strokes below the ridge — slow", dur: [40, 65] },
+  { text: "Small strokes below head", dur: [40, 65] },
   { text: "Twist strokes", dur: [40, 65] },
 ];
 export const D_MID_PALM = [
   { text: "Thumb rub on head", dur: [55, 80] },
-  { text: "Thumb rubs underside of head", dur: [55, 90] },
-  { text: "Palm cups the head, light rubbing", dur: [40, 70] },
-  { text: "Normal Palming — steady rubbing of the head", dur: [60, 130] },
+  { text: "Normal Palming", dur: [60, 130] },
 ];
 export const D_MID_STROKE = [
-  { text: "Stroke the head with two fingers either side", dur: [40, 70] },
-  { text: "Slow full strokes", dur: [40, 70] },
-  { text: "Grip shift — 3 loose, 3 tight", dur: [40, 70] },
+  { text: "Slow long strokes", dur: [40, 70] },
+  { text: "Grip under the head and stroke the tip", dur: [40, 70] },
   { text: "Twist strokes", dur: [30, 70] },
-  { text: "Tight shallow strokes — firm squeeze below ridge", dur: [30, 70] },
 ];
 export const D_OVER_PALM = [
-  { text: "Normal Palming — steady rubbing of the head", dur: [90, 240] },
-  { text: "Slit Press — grind tight circles over the slit", dur: [50, 120] },
+  { text: "Normal Palming", dur: [90, 240] },
 ];
 export const D_OVER_STROKE = [
-  { text: "Shallow strokes under the ridge + palming", dur: [20, 40] },
-  { text: "Shallow, rapid head strokes", dur: [20, 50] },
-  { text: "Progressively tighter downstrokes", dur: [40, 90] },
-  { text: "Trap the ridge and use tiny strokes", dur: [30, 50] },
+  { text: "Small head strokes + thumb over slit", dur: [20, 40] },
+  { text: "Small, rapid head strokes", dur: [20, 50] },
+  { text: "Long tight slow strokes", dur: [40, 90] },
 ];
 export const D_FINISH = [
-  "Clamp the head tight and twist through the climax",
-  "Put thumb over the slit and rub tight circles, with small strokes to finish",
-  "Hold just below the ridge, very fast tip strokes through the release",
-  "Palm the head; other hand pounds short strokes",
-  "Twisting strokes up and down the head",
+  "Clamp the head tight and twist strokes",
+  "Thumb over slit and stroke fast",
+  "Palming and strokes",
 ];
 
 /* ========= PRINCESS MODE (you act on her) ========= */
 export const P_WARM = [
   "Two-fingers stroke outer lips",
-  "Sucky on clit at level 4",
-  "Vibrator on clit at level 1",
+  "Sucky level 3",
+  "Vibrator level 1",
   "One finger gently rubbing her clit",
   "Tongue slowly circling over the clit",
-  "Two fingers pressing just inside",
-  "Slide your cock between her lips, teasing her clit without going inside",
-  "Just the tip — press your cock against her entrance, sliding slowly in/out a little",
+  "Two fingers inside",
 ];
 export const P_BUILD = [
   "Run the vibrator up/down her pussy",
-  "Sucky level 5 locked on clit while fingering slowly",
-  "Sucky level 6 pulsing on and off rhythmically",
-  "Vibrator level 2 pressed on clit while your fingers spread her open",
+  "Sucky level 4 while fingering slowly",
+  "Sucky level 5 pulsing on and off",
+  "Vibrator level 1 while your fingers spread her open",
   "Lick and suck her clit",
-  "Vibrator level 2 on clit while fingering",
-  "Sucky from level 3 → 4 → 5, holding her just below release",
+  "Vibrator level 2 while fingering",
+  "Sucky from level 3 → 4 → 5",
   "Two fingers inside",
-  "Slow, deep strokes while sucky teases her clit",
 ];
 export const P_OVER = [
-  "Thrash Assault — sucky level 8 tapping clit",
-  "Relentless Suck-Lock — sucky level 7 sealed on her clit",
-  "Vibrator level 3 on clit while fingering",
+  "Sucky level 7 tapping clit",
+  "Sucky level 6",
+  "Vibrator level 3 while fingering",
   "Suck on clit while fingering",
-  "Sucky level 8, drop to 5 then back to 8",
-  "Sucky level 7 on clit while fingering",
-  "Vibrator level 3 pressed to clit",
-  "Hard, fast thrusts while sucky sealed on clit",
+  "Sucky level 7, drop to 5 then back to 7",
+  "Sucky level 6 on clit while fingering",
+  "Vibrator level 2 while your fingers spread her open",
 ];
 export const P_FINISH = [
-  "Your Favourite — sucky level 8 pinned to clit",
-  "Double Pressure — sucky level 8 on clit while fingering",
-  "Grinding Lock — Vibrator level 3 on clit while fingering",
-  "Forced Lick Finish — lick and suck clit + hard fingering"
+  "sucky level 8",
+  "sucky level 8 while fingering",
+  "Vibrator level 3 while fingering",
+  "lick and suck clit whilewwwwwww fingering"
 ];
 
 /* ========= SOLO PRINCESS (no internal fingering) ========= */
 /* Toy-specific pools; short, direct, fluid. */
 export const SOLO_SUCKY_WARM = [
-  { text: "Put sucky on clit at level 4", dur: [120, 180] },
-  { text: "Pulse: seal briefly, lift briefly at Level 5", dur: [80, 150] },
+  { text: "Put sucky on clit at level 3", dur: [120, 180] },
+  { text: "Pulse: seal briefly, lift briefly at Level 4", dur: [80, 150] },
 ];
 export const SOLO_SUCKY_BUILD = [
-  { text: "Put sucky on clit at level 5", dur: [100, 160] },
-  { text: "Put sucky on clit at level 6", dur: [80, 140] },
+  { text: "Put sucky on clit at level 4", dur: [100, 160] },
+  { text: "Put sucky on clit at level 5", dur: [80, 140] },
 ];
 export const SOLO_SUCKY_OVER = [
-  { text: "Put sucky on clit at level 7", dur: [50, 80] },
-  { text: "Put sucky on clit at level 8", dur: [50, 70] },
-  { text: "Put sucky on clit at level 8 hold in place squeezing thighs together", dur: [60, 90] },
+  { text: "Put sucky on clit at level 6", dur: [50, 80] },
+  { text: "Put sucky on clit at level 7", dur: [50, 70] },
+  { text: "Put sucky on clit at level 7 hold in place squeezing thighs together", dur: [60, 90] },
 ];
 
 export const SOLO_WAND_WARM = [
@@ -111,13 +99,13 @@ export const SOLO_WAND_OVER = [
 ];
 
 export const SOLO_ZUMIO_WARM = [
-  { text: "Trace tiny circles around the clit hood only", dur: [60, 120] },
+  { text: "Trace tiny circles around the clit", dur: [60, 120] },
   { text: "Drag toy from below clit up and over", dur: [60, 100] },
-  { text: "Skim the edge of the hood — barely touching", dur: [60, 120] },
+  { text: "Skim the edge of the clit — barely touching", dur: [60, 120] },
 ];
 export const SOLO_ZUMIO_BUILD = [
   { text: "Pinpoint on one side of clit", dur: [60, 120] },
-  { text: "Tiny fast circles on the clit", dur: [60, 100] },
+  { text: "Tiny circles on the clit", dur: [60, 100] },
 ];
 export const SOLO_ZUMIO_OVER = [
   { text: "Spread pussy and hold toy on clit", dur: [50, 120] },
