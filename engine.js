@@ -290,63 +290,188 @@ function buildDomPlan(){
   const planOut = [];
   const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
 
-  // Warm-up
-  for (let i = 0; i < warmRounds; i++){
-    const d = randInt(...t.warmSpan);
-    planOut.push({
-      phase:"Warm-up", kind:"Palming",
-      text: taskText(choiceLimitedFrom("D_WARM_PALM", D_WARM_PALM)), dur:d
+  // ---------- helpers ----------
+  const addRest = (phase, range, prob, text = "Hands off. Breathe.") => {
+    const r = maybeRest(range, prob);
+    if (r) planOut.push({ phase, kind: "Rest", text, dur: r });
+  };
+
+  const addWarmBlock = (rounds) => {
+    for (let i = 0; i < rounds; i++){
+      const d = randInt(...t.warmSpan);
+
+      planOut.push({
+        phase: "Warm-up",
+        kind: "Palming",
+        text: taskText(choiceLimitedFrom("D_WARM_PALM", D_WARM_PALM)),
+        dur: d
+      });
+      addRest("Warm-up", t.restWB, t.restProb);
+
+      planOut.push({
+        phase: "Warm-up",
+        kind: "Stroking",
+        text: taskText(choiceLimitedFrom("D_WARM_STROKE", D_WARM_STROKE)),
+        dur: d
+      });
+      addRest("Warm-up", t.restWB, t.restProb);
+    }
+  };
+
+  const addBuildBlock = (cycles, phaseName = "Mid Build-up", durationScale = 1) => {
+    for (let i = 0; i < cycles; i++){
+      const d = Math.round(randInt(...t.buildSpan) * durationScale);
+
+      planOut.push({
+        phase: phaseName,
+        kind: `Palming ${i + 1}`,
+        text: taskText(choiceLimitedFrom("D_MID_PALM", D_MID_PALM)),
+        dur: d
+      });
+      addRest(phaseName, t.restWB, t.restProb);
+
+      planOut.push({
+        phase: phaseName,
+        kind: `Stroking ${i + 1}`,
+        text: taskText(choiceLimitedFrom("D_MID_STROKE", D_MID_STROKE)),
+        dur: d
+      });
+      addRest(phaseName, t.restWB, t.restProb);
+    }
+  };
+
+  const addOverloadBlock = ({
+    rounds,
+    phaseName,
+    palmRange = t.overPalm,
+    strokeRange = t.overStroke,
+    restRange = t.restOver,
+    restProb = t.restProb,
+    palmPool = D_OVER_PALM.concat(D_OVER_PALM), // bias to palming
+    strokePool = D_OVER_STROKE
+  }) => {
+    for (let i = 0; i < rounds; i++){
+      const pd = randInt(...palmRange);
+      planOut.push({
+        phase: phaseName,
+        kind: `Overload Palming ${i + 1}`,
+        text: taskText(choiceLimitedFrom(`${phaseName}_PALM`, palmPool)),
+        dur: pd
+      });
+      addRest(phaseName, restRange, restProb);
+
+      const sd = randInt(...strokeRange);
+      planOut.push({
+        phase: phaseName,
+        kind: `Overload Stroking ${i + 1}`,
+        text: taskText(choiceLimitedFrom(`${phaseName}_STROKE`, strokePool)),
+        dur: sd
+      });
+      addRest(phaseName, restRange, restProb);
+    }
+  };
+
+  const addRecoveryWave = () => {
+    const recoveryPalmPool = D_MID_PALM;
+    const recoveryStrokePool = [
+      { text: "Slow long strokes", dur: [55, 85] },
+      { text: "Loose strokes below the head", dur: [50, 80] },
+      { text: "Gentle twist strokes", dur: [50, 75] },
+    ];
+
+    const recoveryRounds = 2;
+
+    for (let i = 0; i < recoveryRounds; i++){
+      const pd = randInt(70, 100);
+      planOut.push({
+        phase: "Recovery Wave",
+        kind: `Recovery Palming ${i + 1}`,
+        text: taskText(choiceLimitedFrom("RECOVERY_PALM", recoveryPalmPool)),
+        dur: pd
+      });
+
+      const sd = randInt(55, 85);
+      planOut.push({
+        phase: "Recovery Wave",
+        kind: `Recovery Stroking ${i + 1}`,
+        text: taskText(choiceLimitedFrom("RECOVERY_STROKE", recoveryStrokePool)),
+        dur: sd
+      });
+
+      // Fewer rests here so it feels like relief, not a full reset
+      addRest("Recovery Wave", [8, 12], 0.08, "Hands off briefly. Settle.");
+    }
+  };
+
+  // ---------- SHORT: keep existing structure ----------
+  if (LENGTH === "SHORT"){
+    addWarmBlock(warmRounds);
+    addBuildBlock(t.buildCycles, "Mid Build-up", 1);
+
+    addOverloadBlock({
+      rounds: t.overRounds,
+      phaseName: "Cruel Overload",
+      palmRange: t.overPalm,
+      strokeRange: t.overStroke,
+      restRange: t.restOver,
+      restProb: t.restProb
     });
-    const r1 = maybeRest(t.restWB, t.restProb);
-    if (r1) planOut.push({ phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1 });
 
     planOut.push({
-      phase:"Warm-up", kind:"Stroking",
-      text: taskText(choiceLimitedFrom("D_WARM_STROKE", D_WARM_STROKE)), dur:d
+      phase: "Final Reset",
+      kind: "Final reset",
+      text: "Hands off. Breathe.",
+      dur: t.finalReset
     });
-    const r2 = maybeRest(t.restWB, t.restProb);
-    if (r2) planOut.push({ phase:"Warm-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2 });
+
+    return { plan: planOut, finisherPool: D_FINISH };
   }
 
-  // Mid build-up
-  for (let i = 0; i < t.buildCycles; i++){
-    const d = randInt(...t.buildSpan);
-    planOut.push({
-      phase:"Mid Build-up", kind:`Palming ${i+1}`,
-      text: taskText(choiceLimitedFrom("D_MID_PALM", D_MID_PALM)), dur:d
-    });
-    const r1 = maybeRest(t.restWB, t.restProb);
-    if (r1) planOut.push({ phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r1 });
+  // ---------- LONG: wave structure ----------
+  addWarmBlock(warmRounds);
 
-    planOut.push({
-      phase:"Mid Build-up", kind:`Stroking ${i+1}`,
-      text: taskText(choiceLimitedFrom("D_MID_STROKE", D_MID_STROKE)), dur:d
-    });
-    const r2 = maybeRest(t.restWB, t.restProb);
-    if (r2) planOut.push({ phase:"Mid Build-up", kind:"Rest", text:"Hands off. Breathe.", dur:r2 });
-  }
+  // First ramp
+  addBuildBlock(3, "Mid Build-up", 1);
 
-  // Overload
-  for (let i = 0; i < t.overRounds; i++){
-    const pd = randInt(...t.overPalm);
-    const palmingPool = D_OVER_PALM.concat(D_OVER_PALM); // bias to palming
-    planOut.push({
-      phase:"Cruel Overload", kind:`Overload Palming ${i+1}`,
-      text: taskText(choiceLimitedFrom("D_OVER_PALM", palmingPool)), dur:pd
-    });
-    const r1 = maybeRest(t.restOver, t.restProb);
-    if (r1) planOut.push({ phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r1 });
+  // Wave 1 peak - shorter / sharper
+  addOverloadBlock({
+    rounds: 4,
+    phaseName: "Cruel Overload I",
+    palmRange: [55, 80],
+    strokeRange: [12, 22],
+    restRange: [10, 14],
+    restProb: 0.12
+  });
 
-    const sd = randInt(...t.overStroke);
-    planOut.push({
-      phase:"Cruel Overload", kind:`Overload Stroking ${i+1}`,
-      text: taskText(choiceLimitedFrom("D_OVER_STROKE", D_OVER_STROKE)), dur:sd
-    });
-    const r2 = maybeRest(t.restOver, t.restProb);
-    if (r2) planOut.push({ phase:"Cruel Overload", kind:"Rest", text:"Hands off. Breathe.", dur:r2 });
-  }
+  // Dip without killing tension
+  addRecoveryWave();
 
-  planOut.push({ phase:"Final Reset", kind:"Final reset", text:"Hands off. Breathe.", dur:t.finalReset });
+  // Rebuild
+  addBuildBlock(2, "Rebuild", 0.95);
+
+  // Wave 2 peak - longer / harsher
+  addOverloadBlock({
+    rounds: 6,
+    phaseName: "Cruel Overload II",
+    palmRange: [80, 120],
+    strokeRange: [18, 35],
+    restRange: [8, 12],
+    restProb: 0.10,
+    palmPool: D_OVER_PALM.concat(D_OVER_PALM),
+    strokePool: [
+      { text: "Small head strokes + thumb over slit", dur: [20, 35] },
+      { text: "Small, rapid head strokes", dur: [18, 32] },
+      { text: "Long tight slow strokes", dur: [35, 65] },
+    ]
+  });
+
+  planOut.push({
+    phase: "Final Reset",
+    kind: "Final reset",
+    text: "Hands off. Breathe.",
+    dur: t.finalReset
+  });
+
   return { plan: planOut, finisherPool: D_FINISH };
 }
 
@@ -356,23 +481,168 @@ function buildPrincessPlan(){
   const planOut = [];
   const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
 
-  for(let i=0;i<warmRounds;i++){
-    const d = randInt(...t.warmSpan);
-    planOut.push({phase:"Warm-up",  kind:`Warm ${i+1}`,  text: taskText(choiceLimitedFrom("P_WARM", P_WARM)),  dur:d});
-    const r=maybeRest(t.restWB,t.restProb); if(r) planOut.push({phase:"Warm-up",  kind:"Rest", text:"No touch. Hold position.", dur:r});
-  }
-  for(let i=0;i<t.buildCycles;i++){
-    const d = randInt(...t.buildSpan);
-    planOut.push({phase:"Build-up", kind:`Build ${i+1}`, text: taskText(choiceLimitedFrom("P_BUILD", P_BUILD)), dur:d});
-    const r=maybeRest(t.restWB,t.restProb); if(r) planOut.push({phase:"Build-up", kind:"Rest", text:"No touch. Hold position.", dur:r});
-  }
-  for(let i=0;i<t.overRounds;i++){
-    const d = randInt(...t.overSpan);
-    planOut.push({phase:"Cruel Overload", kind:`Overload ${i+1}`, text: taskText(choiceLimitedFrom("P_OVER", P_OVER)),  dur:d});
-    const r=maybeRest(t.restOver,t.restProb); if(r) planOut.push({phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r});
+  // ---------- helpers ----------
+  const addRest = (phase, range, prob, text = "No touch. Hold position.") => {
+    const r = maybeRest(range, prob);
+    if (r) planOut.push({ phase, kind: "Rest", text, dur: r });
+  };
+
+  const addWarmBlock = (rounds, phaseName = "Warm-up", durationScale = 1) => {
+    for(let i = 0; i < rounds; i++){
+      const d = Math.max(1, Math.round(randInt(...t.warmSpan) * durationScale));
+      planOut.push({
+        phase: phaseName,
+        kind: `Warm ${i + 1}`,
+        text: taskText(choiceLimitedFrom(`${phaseName}_P_WARM`, P_WARM)),
+        dur: d
+      });
+      addRest(phaseName, t.restWB, t.restProb);
+    }
+  };
+
+  const addBuildBlock = (cycles, phaseName = "Build-up", durationScale = 1, restProb = t.restProb) => {
+    for(let i = 0; i < cycles; i++){
+      const d = Math.max(1, Math.round(randInt(...t.buildSpan) * durationScale));
+      planOut.push({
+        phase: phaseName,
+        kind: `Build ${i + 1}`,
+        text: taskText(choiceLimitedFrom(`${phaseName}_P_BUILD`, P_BUILD)),
+        dur: d
+      });
+      addRest(phaseName, t.restWB, restProb);
+    }
+  };
+
+  const addOverloadBlock = ({
+    rounds,
+    phaseName,
+    overRange = t.overSpan,
+    restRange = t.restOver,
+    restProb = t.restProb,
+    overPool = P_OVER
+  }) => {
+    for(let i = 0; i < rounds; i++){
+      const d = randInt(...overRange);
+      planOut.push({
+        phase: phaseName,
+        kind: `Overload ${i + 1}`,
+        text: taskText(choiceLimitedFrom(`${phaseName}_P_OVER`, overPool)),
+        dur: d
+      });
+      addRest(phaseName, restRange, restProb);
+    }
+  };
+
+  const addTeaseWave = () => {
+    const teasePool = [
+      "One finger gently rubbing her clit",
+      "Vibrator level 1",
+      "Two-fingers stroke outer lips",
+      "Lick and suck her clit",
+      "Run the vibrator up/down her pussy",
+      "Vibrator level 1 while your fingers spread her open",
+    ];
+
+    const teaseRounds = 2;
+
+    for(let i = 0; i < teaseRounds; i++){
+      const d = randInt(75, 120);
+      planOut.push({
+        phase: "Tease Wave",
+        kind: `Tease ${i + 1}`,
+        text: taskText(choiceLimitedFrom("TEASE_WAVE_P", teasePool)),
+        dur: d
+      });
+
+      // lighter/rarer rest so it feels like a dip, not a full stop
+      addRest("Tease Wave", [8, 14], 0.06, "No touch. Stay right there.");
+    }
+  };
+
+  // ---------- SHORT: unchanged structure ----------
+  if (LENGTH === "SHORT"){
+    addWarmBlock(warmRounds, "Warm-up", 1);
+
+    for(let i = 0; i < t.buildCycles; i++){
+      const d = randInt(...t.buildSpan);
+      planOut.push({
+        phase: "Build-up",
+        kind: `Build ${i + 1}`,
+        text: taskText(choiceLimitedFrom("P_BUILD", P_BUILD)),
+        dur: d
+      });
+      const r = maybeRest(t.restWB, t.restProb);
+      if(r) planOut.push({ phase: "Build-up", kind: "Rest", text: "No touch. Hold position.", dur: r });
+    }
+
+    for(let i = 0; i < t.overRounds; i++){
+      const d = randInt(...t.overSpan);
+      planOut.push({
+        phase: "Cruel Overload",
+        kind: `Overload ${i + 1}`,
+        text: taskText(choiceLimitedFrom("P_OVER", P_OVER)),
+        dur: d
+      });
+      const r = maybeRest(t.restOver, t.restProb);
+      if(r) planOut.push({ phase: "Cruel Overload", kind: "Rest", text: "No touch. Hold position.", dur: r });
+    }
+
+    planOut.push({
+      phase: "Final Reset",
+      kind: "Final Reset",
+      text: "No touch. Breathe.",
+      dur: t.finalReset
+    });
+
+    return { plan: planOut, finisherPool: P_FINISH };
   }
 
-  planOut.push({phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe.", dur:t.finalReset});
+  // ---------- LONG: wave structure ----------
+  addWarmBlock(warmRounds, "Warm-up", 1);
+
+  // First ramp
+  addBuildBlock(3, "Build-up", 1, t.restProb);
+
+  // First peak - shorter
+  addOverloadBlock({
+    rounds: 4,
+    phaseName: "Cruel Overload I",
+    overRange: [110, 170],
+    restRange: [10, 14],
+    restProb: 0.08
+  });
+
+  // Dip without losing arousal
+  addTeaseWave();
+
+  // Rebuild
+  addBuildBlock(2, "Rebuild", 0.9, 0.08);
+
+  // Final peak - longer / harsher
+  addOverloadBlock({
+    rounds: 6,
+    phaseName: "Cruel Overload II",
+    overRange: [150, 240],
+    restRange: [8, 12],
+    restProb: 0.06,
+    overPool: [
+      "Sucky level 7 tapping clit",
+      "Sucky level 6",
+      "Vibrator level 3 while fingering",
+      "Suck on clit while fingering",
+      "Sucky level 7, drop to 5 then back to 7",
+      "Sucky level 6 on clit while fingering",
+      "Vibrator level 2 while your fingers spread her open",
+    ]
+  });
+
+  planOut.push({
+    phase: "Final Reset",
+    kind: "Final Reset",
+    text: "No touch. Breathe.",
+    dur: t.finalReset
+  });
+
   return { plan: planOut, finisherPool: P_FINISH };
 }
 
