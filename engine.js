@@ -13,7 +13,7 @@ import {
   timesFor, randInt, choice, maybeRest, resetChooser, choiceLimitedFrom,
 
   // Solo Princess (toy-specific pools + modifiers map)
-  SOLO_POOLS, SOLO_MODIFIERS
+  SOLO_POOLS,
 } from "./tasks.js";
 
 /* ---------------- Preferences ---------------- */
