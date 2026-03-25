@@ -9,6 +9,13 @@ import {
   D_WARM_PALM, D_WARM_STROKE, D_MID_PALM, D_MID_STROKE, D_OVER_PALM, D_OVER_STROKE, D_FINISH,
   P_WARM, P_BUILD, P_OVER, P_FINISH,
 
+import {
+  ...existing imports...
+  SOLO_TOY_BIAS,
+  setToyBias,
+  getSoloWeights   // not strictly needed but nice
+} from "./tasks.js";
+  
   // Timing + chooser utils
   timesFor, randInt, choice, maybeRest, resetChooser, choiceLimitedFrom,
 
