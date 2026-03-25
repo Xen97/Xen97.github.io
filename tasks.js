@@ -219,14 +219,12 @@ export function choiceLimitedFrom(poolKey, arr){
     localStorage.setItem("sc_soloBias", bias);
   }
 
-  export function getSoloWeights(phase) {
-    if (SOLO_TOY_BIAS === "BALANCED") {
-      return { SUCKY: 3, WAND: 3, ZUMIO: 2 };
-    }
-    if (SOLO_TOY_BIAS === "WAND_HEAVY") {
-      return { SUCKY: 2, WAND: 5, ZUMIO: 3 };
-    }
-    // SUCKY_HEAVY (default)
-    return { SUCKY: 5, WAND: 2, ZUMIO: 2 };
-
-
+export function getSoloWeights(phase) {
+  if (SOLO_TOY_BIAS === "BALANCED") {
+    return { SUCKY: 4, WAND: 4, ZUMIO: 2 };
+  }
+  if (SOLO_TOY_BIAS === "WAND_HEAVY") {
+    return { SUCKY: 2, WAND: 5, ZUMIO: 2 };
+  }
+  return { SUCKY: 5, WAND: 2, ZUMIO: 2 };
+}
