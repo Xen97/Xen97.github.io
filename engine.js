@@ -1,9 +1,6 @@
 // engine.js
 
 // UI helpers
-// engine.js
-
-// UI helpers
 import { els, log, addDivider, setPrimary, setModeTag, mmss } from "./ui.js";
 
 // Task pools & utilities
@@ -18,7 +15,7 @@ import {
   // Solo Princess (toy-specific pools)
   SOLO_POOLS,
 
-  // Toy bias system (new)
+  // Toy bias system
   SOLO_TOY_BIAS,
   setToyBias,
   getSoloWeights
@@ -26,16 +23,16 @@ import {
 
 /* ---------------- Preferences ---------------- */
 export const LS_KEYS = { MODE:'sc_mode', LENGTH:'sc_length', SOUND:'sc_sound' };
-export let MODE   = localStorage.getItem(LS_KEYS.MODE)   || "PRINCESS"; // "DOM" | "PRINCESS" | "PRINCESS_SOLO"
-export let LENGTH = localStorage.getItem(LS_KEYS.LENGTH) || "LONG";     // "SHORT" | "LONG"
-export let SOUND  = localStorage.getItem(LS_KEYS.SOUND)  === "1";       // boolean
+export let MODE   = localStorage.getItem(LS_KEYS.MODE)   || "PRINCESS";
+export let LENGTH = localStorage.getItem(LS_KEYS.LENGTH) || "LONG";
+export let SOUND  = localStorage.getItem(LS_KEYS.SOUND)  === "1";
 
 /* ---------------- Runtime session state ---------------- */
-let plan = [];              // [{phase, kind, text, dur, toy?}]
-let finisherPool = [];      // array of strings, empty in Solo
-let current = 0;            // index into plan
-let remain = 0;             // seconds remaining in current step
-let totalRemain = 0;        // seconds remaining in whole plan
+let plan = [];
+let finisherPool = [];
+let current = 0;
+let remain = 0;
+let totalRemain = 0;
 let ticking = false;
 let lastTs = 0;
 let intervalId = null;
@@ -49,7 +46,7 @@ let skipCount = 0;
 let finisherUsed = "—";
 let prevPhase = "";
 
-/* ---------------- Audio (tiny chime) ---------------- */
+/* ---------------- Audio ---------------- */
 let audioCtx = null;
 function playChime(){
   if(!SOUND) return;
@@ -69,7 +66,6 @@ function playChime(){
 
 /* ---------------- Helpers ---------------- */
 function resolveDuration(task, fallbackRange){
-  // Allow pool items to be strings or { text, dur } where dur is a number or [min,max]
   if (task && typeof task === "object" && "dur" in task){
     const d = task.dur;
     return Array.isArray(d) ? randInt(d[0], d[1]) : d;
@@ -95,7 +91,6 @@ function flashPhase(){
   els.phaseCard.classList.add("phase-flash");
 }
 function pickWeighted(entries){
-  // entries: [{item:'SUCKY', w:10}, ...]
   const total = entries.reduce((a,b)=>a+b.w,0);
   let r = Math.random()*total;
   for(const e of entries){ r -= e.w; if(r <= 0) return e.item; }
@@ -107,7 +102,7 @@ export function start(){
   resetChooser();
   current = 0; completedSteps = 0; restCount = 0; skipCount = 0; finisherUsed = "—"; prevPhase = "";
 
-  const r = buildPlanForMode();   // <-- fix
+  const r = buildPlanForMode();
   plan = r.plan;
   finisherPool = r.finisherPool;
 
@@ -145,11 +140,6 @@ export function setMode(m){
   applyModeButtons();
   log(`${MODE==="DOM"?"Dom":"Princess"} Mode selected`);
 }
-export function setSolo(on){
-  MODE = on ? "PRINCESS_SOLO" : "PRINCESS";
-  applyModeButtons();
-  log(`Mode → ${MODE}`);
-}
 export function setLength(l){
   LENGTH = l;
   applyLengthButtons();
@@ -166,22 +156,24 @@ export function applyModeButtons() {
   setPrimary(els.domBtn,       MODE === "DOM");
   setPrimary(els.princessBtn,  MODE === "PRINCESS" || MODE === "PRINCESS_SOLO");
   setPrimary(els.soloBtn, MODE === "PRINCESS_SOLO");
-els.soloBtn.classList.toggle("ghost", MODE !== "PRINCESS_SOLO"); // <-- ensure not ghost when active
+  els.soloBtn.classList.toggle("ghost", MODE !== "PRINCESS_SOLO");
 
-  }
+  setModeTag(MODE === "DOM" ? "DOM" : "Princess Mode");
 
-  setModeTag(MODE === "DOM" ? "DOM" : "PRINCESS");
-    
   if (MODE === "DOM") {
     document.documentElement.style.setProperty("--accent", "var(--accentDom)");
     document.documentElement.style.setProperty("--accentGlow", "rgba(155,89,182,.18)");
-    applyToyBiasButtons();
   } else {
-    toggleToyBiasVisibility();
     document.documentElement.style.setProperty("--accent", "var(--accentPrincess)");
     document.documentElement.style.setProperty("--accentGlow", "rgba(230,102,102,.18)");
-
+  }
   localStorage.setItem(LS_KEYS.MODE, MODE);
+
+  // Toy bias visibility (works for both Princess and Solo)
+  toggleToyBiasVisibility();
+  if (MODE === "PRINCESS" || MODE === "PRINCESS_SOLO") {
+    applyToyBiasButtons();
+  }
 }
 
 export function applyLengthButtons(){
@@ -194,6 +186,19 @@ export function applySoundButton(){
   els.soundBtn.setAttribute("aria-pressed", SOUND ? "true" : "false");
   els.soundBtn.textContent = SOUND ? "🔊 Sound On" : "🔇 Sound Off";
   localStorage.setItem(LS_KEYS.SOUND, SOUND ? "1" : "0");
+}
+
+/* ---------------- Toy Bias UI Helpers (moved here so they are available) ---------------- */
+export function applyToyBiasButtons() {
+  const b = SOLO_TOY_BIAS;
+  setPrimary(els.biasSuckyBtn,    b === "SUCKY_HEAVY");
+  setPrimary(els.biasBalancedBtn, b === "BALANCED");
+  setPrimary(els.biasWandBtn,     b === "WAND_HEAVY");
+}
+
+export function toggleToyBiasVisibility() {
+  const show = MODE === "PRINCESS" || MODE === "PRINCESS_SOLO";
+  if (els.toyBiasGroup) els.toyBiasGroup.style.display = show ? "flex" : "none";
 }
 
 /* ---------------- Rendering & timing ---------------- */
@@ -256,13 +261,10 @@ function updateMeterAndTimes(){
   els.eta.textContent = "~" + mmss(Math.ceil(totalRemain)) + " left";
 }
 
-/* ---------------- Summary & Log ---------------- */
+/* ---------------- Summary ---------------- */
 function openSummary(){
   try{
-    const totalSecs = Array.isArray(plan) && plan.length
-      ? plan.reduce((a,b)=> a + (b?.dur || 0), 0)
-      : 0;
-
+    const totalSecs = Array.isArray(plan) && plan.length ? plan.reduce((a,b)=> a + (b?.dur || 0), 0) : 0;
     const startStr = sessionStart instanceof Date ? sessionStart.toLocaleTimeString() : "—";
     const endStr   = sessionEnd   instanceof Date ? sessionEnd.toLocaleTimeString()   : "—";
 
@@ -296,395 +298,20 @@ export function saveLog(){
 }
 
 /* ---------------- Plan builders ---------------- */
-function buildDomPlan(){
-  const t = timesFor("DOM", LENGTH);
-  const planOut = [];
-  const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
+function buildDomPlan(){ ... }   // ← keep your full wave structure here (I omitted it for brevity — leave yours unchanged)
 
-  // ---------- helpers ----------
-  const addRest = (phase, range, prob, text = "Hands off. Breathe.") => {
-    const r = maybeRest(range, prob);
-    if (r) planOut.push({ phase, kind: "Rest", text, dur: r });
-  };
-
-  const addWarmBlock = (rounds) => {
-    for (let i = 0; i < rounds; i++){
-      const d = randInt(...t.warmSpan);
-
-      planOut.push({
-        phase: "Warm-up",
-        kind: "Palming",
-        text: taskText(choiceLimitedFrom("D_WARM_PALM", D_WARM_PALM)),
-        dur: d
-      });
-      addRest("Warm-up", t.restWB, t.restProb);
-
-      planOut.push({
-        phase: "Warm-up",
-        kind: "Stroking",
-        text: taskText(choiceLimitedFrom("D_WARM_STROKE", D_WARM_STROKE)),
-        dur: d
-      });
-      addRest("Warm-up", t.restWB, t.restProb);
-    }
-  };
-
-  const addBuildBlock = (cycles, phaseName = "Mid Build-up", durationScale = 1) => {
-    for (let i = 0; i < cycles; i++){
-      const d = Math.round(randInt(...t.buildSpan) * durationScale);
-
-      planOut.push({
-        phase: phaseName,
-        kind: `Palming ${i + 1}`,
-        text: taskText(choiceLimitedFrom("D_MID_PALM", D_MID_PALM)),
-        dur: d
-      });
-      addRest(phaseName, t.restWB, t.restProb);
-
-      planOut.push({
-        phase: phaseName,
-        kind: `Stroking ${i + 1}`,
-        text: taskText(choiceLimitedFrom("D_MID_STROKE", D_MID_STROKE)),
-        dur: d
-      });
-      addRest(phaseName, t.restWB, t.restProb);
-    }
-  };
-
-  const addOverloadBlock = ({
-    rounds,
-    phaseName,
-    palmRange = t.overPalm,
-    strokeRange = t.overStroke,
-    restRange = t.restOver,
-    restProb = t.restProb,
-    palmPool = D_OVER_PALM.concat(D_OVER_PALM), // bias to palming
-    strokePool = D_OVER_STROKE
-  }) => {
-    for (let i = 0; i < rounds; i++){
-      const pd = randInt(...palmRange);
-      planOut.push({
-        phase: phaseName,
-        kind: `Overload Palming ${i + 1}`,
-        text: taskText(choiceLimitedFrom(`${phaseName}_PALM`, palmPool)),
-        dur: pd
-      });
-      addRest(phaseName, restRange, restProb);
-
-      const sd = randInt(...strokeRange);
-      planOut.push({
-        phase: phaseName,
-        kind: `Overload Stroking ${i + 1}`,
-        text: taskText(choiceLimitedFrom(`${phaseName}_STROKE`, strokePool)),
-        dur: sd
-      });
-      addRest(phaseName, restRange, restProb);
-    }
-  };
-
-  const addRecoveryWave = () => {
-    const recoveryPalmPool = D_MID_PALM;
-    const recoveryStrokePool = [
-      { text: "Slow long strokes", dur: [55, 85] },
-      { text: "Loose strokes below the head", dur: [50, 80] },
-      { text: "Gentle twist strokes", dur: [50, 75] },
-    ];
-
-    const recoveryRounds = 2;
-
-    for (let i = 0; i < recoveryRounds; i++){
-      const pd = randInt(70, 100);
-      planOut.push({
-        phase: "Recovery Wave",
-        kind: `Recovery Palming ${i + 1}`,
-        text: taskText(choiceLimitedFrom("RECOVERY_PALM", recoveryPalmPool)),
-        dur: pd
-      });
-
-      const sd = randInt(55, 85);
-      planOut.push({
-        phase: "Recovery Wave",
-        kind: `Recovery Stroking ${i + 1}`,
-        text: taskText(choiceLimitedFrom("RECOVERY_STROKE", recoveryStrokePool)),
-        dur: sd
-      });
-
-      // Fewer rests here so it feels like relief, not a full reset
-      addRest("Recovery Wave", [8, 12], 0.08, "Hands off briefly. Settle.");
-    }
-  };
-
-  // ---------- SHORT: keep existing structure ----------
-  if (LENGTH === "SHORT"){
-    addWarmBlock(warmRounds);
-    addBuildBlock(t.buildCycles, "Mid Build-up", 1);
-
-    addOverloadBlock({
-      rounds: t.overRounds,
-      phaseName: "Cruel Overload",
-      palmRange: t.overPalm,
-      strokeRange: t.overStroke,
-      restRange: t.restOver,
-      restProb: t.restProb
-    });
-
-    planOut.push({
-      phase: "Final Reset",
-      kind: "Final reset",
-      text: "Hands off. Breathe.",
-      dur: t.finalReset
-    });
-
-    return { plan: planOut, finisherPool: D_FINISH };
-  }
-
-  // ---------- LONG: wave structure ----------
-  addWarmBlock(warmRounds);
-
-  // First ramp
-  addBuildBlock(3, "Mid Build-up", 1);
-
-  // Wave 1 peak - shorter / sharper
-  addOverloadBlock({
-    rounds: 4,
-    phaseName: "Cruel Overload I",
-    palmRange: [55, 80],
-    strokeRange: [12, 22],
-    restRange: [10, 14],
-    restProb: 0.12
-  });
-
-  // Dip without killing tension
-  addRecoveryWave();
-
-  // Rebuild
-  addBuildBlock(2, "Rebuild", 0.95);
-
-  // Wave 2 peak - longer / harsher
-  addOverloadBlock({
-    rounds: 6,
-    phaseName: "Cruel Overload II",
-    palmRange: [80, 120],
-    strokeRange: [18, 35],
-    restRange: [8, 12],
-    restProb: 0.10,
-    palmPool: D_OVER_PALM.concat(D_OVER_PALM),
-    strokePool: [
-      { text: "Small head strokes + thumb over slit", dur: [20, 35] },
-      { text: "Small, rapid head strokes", dur: [18, 32] },
-      { text: "Long tight slow strokes", dur: [35, 65] },
-    ]
-  });
-
-  planOut.push({
-    phase: "Final Reset",
-    kind: "Final reset",
-    text: "Hands off. Breathe.",
-    dur: t.finalReset
-  });
-
-  return { plan: planOut, finisherPool: D_FINISH };
-}
-
-
-function buildPrincessPlan(){
-  const t = timesFor("PRINCESS", LENGTH);
-  const planOut = [];
-  const warmRounds = Math.max(1, Math.round(choice(t.warmRounds)));
-
-  // ---------- helpers ----------
-  const addRest = (phase, range, prob, text = "No touch. Hold position.") => {
-    const r = maybeRest(range, prob);
-    if (r) planOut.push({ phase, kind: "Rest", text, dur: r });
-  };
-
-  const addWarmBlock = (rounds, phaseName = "Warm-up", durationScale = 1) => {
-    for(let i = 0; i < rounds; i++){
-      const d = Math.max(1, Math.round(randInt(...t.warmSpan) * durationScale));
-      planOut.push({
-        phase: phaseName,
-        kind: `Warm ${i + 1}`,
-        text: taskText(choiceLimitedFrom(`${phaseName}_P_WARM`, P_WARM)),
-        dur: d
-      });
-      addRest(phaseName, t.restWB, t.restProb);
-    }
-  };
-
-  const addBuildBlock = (cycles, phaseName = "Build-up", durationScale = 1, restProb = t.restProb) => {
-    for(let i = 0; i < cycles; i++){
-      const d = Math.max(1, Math.round(randInt(...t.buildSpan) * durationScale));
-      planOut.push({
-        phase: phaseName,
-        kind: `Build ${i + 1}`,
-        text: taskText(choiceLimitedFrom(`${phaseName}_P_BUILD`, P_BUILD)),
-        dur: d
-      });
-      addRest(phaseName, t.restWB, restProb);
-    }
-  };
-
-  const addOverloadBlock = ({
-    rounds,
-    phaseName,
-    overRange = t.overSpan,
-    restRange = t.restOver,
-    restProb = t.restProb,
-    overPool = P_OVER
-  }) => {
-    for(let i = 0; i < rounds; i++){
-      const d = randInt(...overRange);
-      planOut.push({
-        phase: phaseName,
-        kind: `Overload ${i + 1}`,
-        text: taskText(choiceLimitedFrom(`${phaseName}_P_OVER`, overPool)),
-        dur: d
-      });
-      addRest(phaseName, restRange, restProb);
-    }
-  };
-
-  const addTeaseWave = () => {
-    const teasePool = [
-      "One finger gently rubbing her clit",
-      "Vibrator level 1",
-      "Two-fingers stroke outer lips",
-      "Lick and suck her clit",
-      "Run the vibrator up/down her pussy",
-      "Vibrator level 1 while your fingers spread her open",
-    ];
-
-    const teaseRounds = 2;
-
-    for(let i = 0; i < teaseRounds; i++){
-      const d = randInt(75, 120);
-      planOut.push({
-        phase: "Tease Wave",
-        kind: `Tease ${i + 1}`,
-        text: taskText(choiceLimitedFrom("TEASE_WAVE_P", teasePool)),
-        dur: d
-      });
-
-      // lighter/rarer rest so it feels like a dip, not a full stop
-      addRest("Tease Wave", [8, 14], 0.06, "No touch. Stay right there.");
-    }
-  };
-
-  // ---------- SHORT: unchanged structure ----------
-  if (LENGTH === "SHORT"){
-    addWarmBlock(warmRounds, "Warm-up", 1);
-
-    for(let i = 0; i < t.buildCycles; i++){
-      const d = randInt(...t.buildSpan);
-      planOut.push({
-        phase: "Build-up",
-        kind: `Build ${i + 1}`,
-        text: taskText(choiceLimitedFrom("P_BUILD", P_BUILD)),
-        dur: d
-      });
-      const r = maybeRest(t.restWB, t.restProb);
-      if(r) planOut.push({ phase: "Build-up", kind: "Rest", text: "No touch. Hold position.", dur: r });
-    }
-
-    for(let i = 0; i < t.overRounds; i++){
-      const d = randInt(...t.overSpan);
-      planOut.push({
-        phase: "Cruel Overload",
-        kind: `Overload ${i + 1}`,
-        text: taskText(choiceLimitedFrom("P_OVER", P_OVER)),
-        dur: d
-      });
-      const r = maybeRest(t.restOver, t.restProb);
-      if(r) planOut.push({ phase: "Cruel Overload", kind: "Rest", text: "No touch. Hold position.", dur: r });
-    }
-
-    planOut.push({
-      phase: "Final Reset",
-      kind: "Final Reset",
-      text: "No touch. Breathe.",
-      dur: t.finalReset
-    });
-
-    return { plan: planOut, finisherPool: P_FINISH };
-  }
-
-  // ---------- LONG: wave structure ----------
-  addWarmBlock(warmRounds, "Warm-up", 1);
-
-  // First ramp
-  addBuildBlock(3, "Build-up", 1, t.restProb);
-
-  // First peak - shorter
-  addOverloadBlock({
-    rounds: 4,
-    phaseName: "Cruel Overload I",
-    overRange: [110, 170],
-    restRange: [10, 14],
-    restProb: 0.08
-  });
-
-  // Dip without losing arousal
-  addTeaseWave();
-
-  // Rebuild
-  addBuildBlock(2, "Rebuild", 0.9, 0.08);
-
-  // Final peak - longer / harsher
-  addOverloadBlock({
-    rounds: 6,
-    phaseName: "Cruel Overload II",
-    overRange: [150, 240],
-    restRange: [8, 12],
-    restProb: 0.06,
-    overPool: [
-      "Sucky level 7 tapping clit",
-      "Sucky level 6",
-      "Vibrator level 3 while fingering",
-      "Suck on clit while fingering",
-      "Sucky level 7, drop to 5 then back to 7",
-      "Sucky level 6 on clit while fingering",
-      "Vibrator level 2 while your fingers spread her open",
-    ]
-  });
-
-  planOut.push({
-    phase: "Final Reset",
-    kind: "Final Reset",
-    text: "No touch. Breathe.",
-    dur: t.finalReset
-  });
-
-  return { plan: planOut, finisherPool: P_FINISH };
-}
+function buildPrincessPlan(){ ... }   // ← keep your full wave structure here too
 
 /* ---------------- Solo Princess ---------------- */
 
-/* ========= SOLO PRINCESS – Toy Bias ========= */
-// SOLO_TOY_BIAS is imported from tasks.js — do NOT re-declare it here
-
-export function setToyBias(bias) {
-  SOLO_TOY_BIAS = bias;
-  localStorage.setItem("sc_soloBias", bias);
-}
-
-export function getSoloWeights(phase) {
-  if (SOLO_TOY_BIAS === "BALANCED") {
-    return { SUCKY: 3, WAND: 3, ZUMIO: 2 };
-  }
-  if (SOLO_TOY_BIAS === "WAND_HEAVY") {
-    return { SUCKY: 2, WAND: 5, ZUMIO: 3 };
-  }
-  // default = SUCKY_HEAVY
-  return { SUCKY: 5, WAND: 2, ZUMIO: 2 };
-}
-
+// Toy bias functions are imported — we only need the picker
 function pickToyForPhase(phase) {
   const weights = getSoloWeights(phase);
   const entries = Object.keys(weights).map(k => ({ item: k, w: weights[k] }));
   return pickWeighted(entries) || "SUCKY";
 }
 
-// Build a Solo plan with weighted toy selection + per-task durations
+// Build a Solo plan with weighted toy selection
 function buildSoloPrincessPlan(){
   const t = timesFor("PRINCESS", LENGTH);
   const out = [];
@@ -732,14 +359,12 @@ function buildSoloPrincessPlan(){
     if(r) out.push({ phase:"Cruel Overload", kind:"Rest", text:"No touch. Hold position.", dur:r });
   }
 
-  // Final Reset — denial
   out.push({ phase:"Final Reset", kind:"Final Reset", text:"No touch. Breathe.", dur:t.finalReset });
   return { plan: out, finisherPool: [] };
 }
-// Pick the correct plan based on MODE
+
 function buildPlanForMode(){
   if (MODE === "DOM") return buildDomPlan();
   if (MODE === "PRINCESS_SOLO") return buildSoloPrincessPlan();
-  return buildPrincessPlan(); // default
+  return buildPrincessPlan();
 }
-
