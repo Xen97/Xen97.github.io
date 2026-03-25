@@ -228,5 +228,5 @@ export function choiceLimitedFrom(poolKey, arr){
     }
     // SUCKY_HEAVY (default)
     return { SUCKY: 5, WAND: 2, ZUMIO: 2 };
-  }
 }
+
