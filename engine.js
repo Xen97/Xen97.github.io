@@ -168,13 +168,16 @@ export function applyModeButtons() {
   setPrimary(els.soloBtn, MODE === "PRINCESS_SOLO");
 els.soloBtn.classList.toggle("ghost", MODE !== "PRINCESS_SOLO"); // <-- ensure not ghost when active
 
+  }
 
   setModeTag(MODE === "DOM" ? "DOM" : "PRINCESS");
-
+    
   if (MODE === "DOM") {
     document.documentElement.style.setProperty("--accent", "var(--accentDom)");
     document.documentElement.style.setProperty("--accentGlow", "rgba(155,89,182,.18)");
+    applyToyBiasButtons();
   } else {
+    toggleToyBiasVisibility();
     document.documentElement.style.setProperty("--accent", "var(--accentPrincess)");
     document.documentElement.style.setProperty("--accentGlow", "rgba(230,102,102,.18)");
   }
@@ -192,14 +195,7 @@ export function applySoundButton(){
   els.soundBtn.textContent = SOUND ? "🔊 Sound On" : "🔇 Sound Off";
   localStorage.setItem(LS_KEYS.SOUND, SOUND ? "1" : "0");
 }
-export function applyModeButtons() {
-  // ... your existing code (setPrimary, setModeTag, accent colors, localStorage) ...
 
-  toggleToyBiasVisibility();
-  if (MODE === "PRINCESS" || MODE === "PRINCESS_SOLO") {
-    applyToyBiasButtons();
-  }
-}
 /* ---------------- Rendering & timing ---------------- */
 function step(elapsedSec){
   remain -= elapsedSec;
