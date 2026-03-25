@@ -4,10 +4,12 @@
 export const D_WARM_PALM = [
   { text: "Flat palming over the head — slow circles", dur: [40, 65] },
   { text: "Thumb rubs underside of head", dur: [40, 65] },
+  { text: "Light fingertip tracing along the head", dur: [30, 50] },
 ];
 export const D_WARM_STROKE = [
   { text: "Small strokes below head", dur: [40, 65] },
   { text: "Twist strokes", dur: [40, 65] },
+  { text: "Long slow strokes", dur: [40, 65] },
 ];
 export const D_MID_PALM = [
   { text: "Thumb rub on head", dur: [55, 80] },
@@ -19,7 +21,7 @@ export const D_MID_STROKE = [
   { text: "Twist strokes", dur: [30, 70] },
 ];
 export const D_OVER_PALM = [
-  { text: "Normal Palming", dur: [90, 240] },
+  { text: "Normal Palming", dur: [60, 180] },
 ];
 export const D_OVER_STROKE = [
   { text: "Small head strokes + thumb over slit", dur: [20, 40] },
@@ -37,8 +39,8 @@ export const P_WARM = [
   "Two-fingers stroke outer lips",
   "Sucky level 3",
   "Vibrator level 1",
-  "One finger gently rubbing her clit",
-  "Tongue slowly circling over the clit",
+  "One finger gently rubbing clit",
+  "Tongue slowly circling over clit",
   "Two fingers inside",
 ];
 export const P_BUILD = [
