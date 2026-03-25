@@ -23,13 +23,6 @@ import {
   setToyBias,
   getSoloWeights
 } from "./tasks.js";
-  
-  // Timing + chooser utils
-  timesFor, randInt, choice, maybeRest, resetChooser, choiceLimitedFrom,
-
-  // Solo Princess (toy-specific pools + modifiers map)
-  SOLO_POOLS,
-} from "./tasks.js";
 
 /* ---------------- Preferences ---------------- */
 export const LS_KEYS = { MODE:'sc_mode', LENGTH:'sc_length', SOUND:'sc_sound' };
