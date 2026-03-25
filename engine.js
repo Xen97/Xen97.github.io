@@ -648,15 +648,32 @@ function buildPrincessPlan(){
 
 /* ---------------- Solo Princess ---------------- */
 
-// Favor SUCKY across all phases
-const SOLO_WEIGHTS = {
-  WARM:  { SUCKY: 5, WAND: 2, ZUMIO: 2 },
-  BUILD: { SUCKY: 5, WAND: 2, ZUMIO: 2 },
-  OVER:  { SUCKY: 5, WAND: 2, ZUMIO: 2 },
-};
-function pickToyForPhase(phase){
-  const m = SOLO_WEIGHTS[phase];
-  const entries = Object.keys(m).map(k => ({ item: k, w: Number(m[k]) || 0 }));
+/* ========= SOLO PRINCESS – Toy Bias ========= */
+export let SOLO_TOY_BIAS = "SUCKY_HEAVY"; // "SUCKY_HEAVY" | "BALANCED" | "WAND_HEAVY"
+
+export function setToyBias(bias) {
+  SOLO_TOY_BIAS = bias;
+  // optional: save to localStorage if you want it to persist
+  localStorage.setItem("sc_soloBias", bias);
+}
+
+export function getSoloWeights(phase) {
+  const base = { SUCKY: 5, WAND: 2, ZUMIO: 2 };
+
+  if (SOLO_TOY_BIAS === "BALANCED") {
+    return { SUCKY: 3, WAND: 3, ZUMIO: 2 };
+  }
+  if (SOLO_TOY_BIAS === "WAND_HEAVY") {
+    return { SUCKY: 2, WAND: 5, ZUMIO: 3 };
+  }
+  // default = SUCKY_HEAVY
+  return base;
+}
+
+// Replace the old SOLO_WEIGHTS and pickToyForPhase
+function pickToyForPhase(phase) {
+  const weights = getSoloWeights(phase);
+  const entries = Object.keys(weights).map(k => ({ item: k, w: weights[k] }));
   return pickWeighted(entries) || "SUCKY";
 }
 
