@@ -14,6 +14,19 @@ function wireControls() {
   els.domBtn.addEventListener("click", () => { setMode("DOM"); applyModeButtons(); });
   els.princessBtn.addEventListener("click", () => { setMode("PRINCESS"); applyModeButtons(); });
   els.soloBtn.addEventListener("click", () => {
+    // Toy bias buttons
+  els.biasSuckyBtn.addEventListener("click", () => {
+    setToyBias("SUCKY_HEAVY");
+    applyToyBiasButtons();
+  });
+  els.biasBalancedBtn.addEventListener("click", () => {
+    setToyBias("BALANCED");
+    applyToyBiasButtons();
+  });
+  els.biasWandBtn.addEventListener("click", () => {
+    setToyBias("WAND_HEAVY");
+    applyToyBiasButtons();
+  });
     const next = (MODE === "PRINCESS_SOLO") ? "PRINCESS" : "PRINCESS_SOLO";
     setMode(next);
     applyModeButtons();
