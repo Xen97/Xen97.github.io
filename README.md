@@ -87,11 +87,11 @@
           <button id="domBtn" class="btn" aria-pressed="false">Dom Mode</button>
           <button id="princessBtn" class="btn primary" aria-pressed="true">Princess Mode</button>
           <button id="soloBtn" class="btn ghost" aria-pressed="false" title="Solo Princess">Solo</button>
-          <div id="toyBiasGroup" class="button-group" style="display:none;">
-            <button id="biasSuckyBtn">Sucky Heavy</button>
-            <button id="biasBalancedBtn">Balanced</button>
-            <button id="biasWandBtn">Wand Heavy</button>
-          </div>
+        <div id="toyBiasGroup" class="row" style="display:none;">
+          <button id="biasSuckyBtn" class="btn ghost" aria-pressed="false">Sucky Heavy</button>
+          <button id="biasBalancedBtn" class="btn ghost" aria-pressed="false">Balanced</button>
+          <button id="biasWandBtn" class="btn ghost" aria-pressed="false">Wand Heavy</button>
+        </div>
           <button id="shortBtn" class="btn" aria-pressed="false">Short</button>
           <button id="longBtn" class="btn primary" aria-pressed="true">Long</button>
         </div>
