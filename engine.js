@@ -666,7 +666,7 @@ function buildPrincessPlan(){
   localStorage.setItem("sc_soloBias", bias);
 }
 
-export function getSoloWeights(phase) {
+{
   const base = { SUCKY: 5, WAND: 2, ZUMIO: 2 };
 
   if (SOLO_TOY_BIAS === "BALANCED") {
