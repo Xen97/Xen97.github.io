@@ -660,8 +660,6 @@ function buildPrincessPlan(){
 /* ---------------- Solo Princess ---------------- */
 
 /* ========= SOLO PRINCESS – Toy Bias ========= */
-export let SOLO_TOY_BIAS = "SUCKY_HEAVY"; // "SUCKY_HEAVY" | "BALANCED" | "WAND_HEAVY"
-
 export function setToyBias(bias) {
   SOLO_TOY_BIAS = bias;
   // optional: save to localStorage if you want it to persist
