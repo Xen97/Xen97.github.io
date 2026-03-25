@@ -11,9 +11,7 @@ import {
 
 import {
   ...existing imports...
-  SOLO_TOY_BIAS,
-  setToyBias,
-  getSoloWeights   // not strictly needed but nice
+  SOLO_TOY_BIAS, setToyBias, getSoloWeights   // not strictly needed but nice
 } from "./tasks.js";
   
   // Timing + chooser utils
@@ -191,7 +189,14 @@ export function applySoundButton(){
   els.soundBtn.textContent = SOUND ? "🔊 Sound On" : "🔇 Sound Off";
   localStorage.setItem(LS_KEYS.SOUND, SOUND ? "1" : "0");
 }
+export function applyModeButtons() {
+  // ... your existing code (setPrimary, setModeTag, accent colors, localStorage) ...
 
+  toggleToyBiasVisibility();
+  if (MODE === "PRINCESS" || MODE === "PRINCESS_SOLO") {
+    applyToyBiasButtons();
+  }
+}
 /* ---------------- Rendering & timing ---------------- */
 function step(elapsedSec){
   remain -= elapsedSec;
