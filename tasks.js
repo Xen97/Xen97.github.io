@@ -67,6 +67,11 @@ export const P_FINISH = [
   "lick and suck clit while fingering"
 ];
 
+function pickToyForPhase(phase) {
+  const weights = getSoloWeights(phase);
+  const entries = Object.keys(weights).map(k => ({ item: k, w: weights[k] }));
+  return pickWeighted(entries) || "SUCKY";
+}
 /* ========= SOLO PRINCESS (no internal fingering) ========= */
 /* Toy-specific pools; short, direct, fluid. */
 export const SOLO_SUCKY_WARM = [
@@ -188,5 +193,23 @@ export function choiceLimitedFrom(poolKey, arr){
   usageCounts[poolKey][label] = (usageCounts[poolKey][label] || 0) + 1;
   lastPick[poolKey] = label;
   return fallback;
-}
+  
+  /* ========= SOLO PRINCESS – Toy Bias ========= */
+  export let SOLO_TOY_BIAS = localStorage.getItem("sc_soloBias") || "SUCKY_HEAVY";
 
+  export function setToyBias(bias) {
+    SOLO_TOY_BIAS = bias;
+    localStorage.setItem("sc_soloBias", bias);
+  }
+
+  export function getSoloWeights(phase) {
+    if (SOLO_TOY_BIAS === "BALANCED") {
+      return { SUCKY: 3, WAND: 3, ZUMIO: 2 };
+    }
+    if (SOLO_TOY_BIAS === "WAND_HEAVY") {
+      return { SUCKY: 2, WAND: 5, ZUMIO: 3 };
+    }
+    // SUCKY_HEAVY (default)
+    return { SUCKY: 5, WAND: 2, ZUMIO: 2 };
+  }
+}
