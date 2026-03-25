@@ -197,7 +197,7 @@ export function applyToyBiasButtons() {
 }
 
 export function toggleToyBiasVisibility() {
-  const show = MODE === "PRINCESS" || MODE === "PRINCESS_SOLO";
+  const show = MODE === "PRINCESS_SOLO";
   if (els.toyBiasGroup) els.toyBiasGroup.style.display = show ? "flex" : "none";
 }
 
