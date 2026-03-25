@@ -132,34 +132,36 @@ export const SOLO_POOLS = {
 };
 
 /* ========= Timing presets (moved here so engine can import) ========= */
-export function timesFor(mode, length){
-  if(mode === "DOM"){
-    return (length === "SHORT") ? {
-      warmRounds:[2,3], buildCycles:3, overRounds:5,
-      warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
-      restWB:[10,18], restOver:[10,15], finalReset:60, restProb:0.15
-    } : {
-      warmRounds:[2,3], buildCycles:6, overRounds:9,
-      warmSpan:[50,65], buildSpan:[55,70], overPalm:[60,85], overStroke:[12,20],
-      restWB:[10,18], restOver:[10,15], finalReset:90, restProb:0.15
-    };
-} else { // PRINCESS / SOLO
-  if (length === "SHORT") {
-    return {
-      warmRounds: [3,4], buildCycles: 4, overRounds: 6,
-      warmSpan: [90,150], buildSpan: [90,150], overSpan: [120,210],
-      restWB: [10,20], restOver: [10,15], finalReset: 120, restProb: 0.10
-    };
-  } else {
-    return {
-      warmRounds: [4,6], buildCycles: 6, overRounds: 10,
-      warmSpan: [90,150], buildSpan: [90,150], overSpan: [150,240],
-      // Longer rests in LONG sessions:
-      restWB: [18,30],     // was [15,25]
-      restOver: [15,22],   // was [12,18]
-      finalReset: 150,
-      restProb: 0.08
-    };
+export function timesFor(mode, length) {
+  if (mode === "DOM") {
+    return (length === "SHORT")
+      ? {
+          warmRounds: [2, 3], buildCycles: 3, overRounds: 5,
+          warmSpan: [50, 65], buildSpan: [55, 70], overPalm: [60, 85], overStroke: [12, 20],
+          restWB: [10, 18], restOver: [10, 15], finalReset: 60, restProb: 0.15
+        }
+      : {
+          warmRounds: [2, 3], buildCycles: 6, overRounds: 9,
+          warmSpan: [50, 65], buildSpan: [55, 70], overPalm: [60, 85], overStroke: [12, 20],
+          restWB: [10, 18], restOver: [10, 15], finalReset: 90, restProb: 0.15
+        };
+  } else { // PRINCESS / SOLO
+    if (length === "SHORT") {
+      return {
+        warmRounds: [3, 4], buildCycles: 4, overRounds: 6,
+        warmSpan: [90, 150], buildSpan: [90, 150], overSpan: [120, 210],
+        restWB: [10, 20], restOver: [10, 15], finalReset: 120, restProb: 0.10
+      };
+    } else {
+      return {
+        warmRounds: [4, 6], buildCycles: 6, overRounds: 10,
+        warmSpan: [90, 150], buildSpan: [90, 150], overSpan: [150, 240],
+        restWB: [18, 30],
+        restOver: [15, 22],
+        finalReset: 150,
+        restProb: 0.08
+      };
+    }
   }
 }
 
