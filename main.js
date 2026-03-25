@@ -1,11 +1,13 @@
 // main.js
-import { els } from "./ui.js";
+import { els, setPrimary } from "./ui.js";
 import {
   LS_KEYS,
   start, pause, skip, finishNow,
   applyModeButtons, applyLengthButtons, applySoundButton,
+  applyToyBiasButtons, toggleToyBiasVisibility,
   setMode, setLength, toggleSound, MODE, LENGTH
 } from "./engine.js";
+import { setToyBias, SOLO_TOY_BIAS } from "./tasks.js";
 import { setupEasterEgg } from "./easteregg.js";
 
 // ---- events wiring ----
@@ -76,21 +78,20 @@ export function toggleToyBiasVisibility() {
 
 // ---- boot ----
 function boot() {
-  // Restore MODE
   const stored = localStorage.getItem(LS_KEYS.MODE);
-  const normalized = (stored === "DOM" || stored === "PRINCESS" || stored === "PRINCESS_SOLO") ? stored : "PRINCESS";
+  const normalized = (stored === "DOM" || stored === "PRINCESS" || stored === "PRINCESS_SOLO")
+    ? stored
+    : "PRINCESS";
   setMode(normalized);
 
-  // Restore toy bias (SOLO_TOY_BIAS is exported from tasks.js)
   const savedBias = localStorage.getItem("sc_soloBias");
-  if (savedBias) SOLO_TOY_BIAS = savedBias;   // this works because it's a live binding
+  if (savedBias) setToyBias(savedBias);
 
-  // Initial UI
   applyModeButtons();
   applyLengthButtons();
   applySoundButton();
+  applyToyBiasButtons();
 
-  // Initial text
   els.phase.textContent = "—";
   els.task.textContent  = "Ready when you are.";
   els.clock.textContent = "00:00";
