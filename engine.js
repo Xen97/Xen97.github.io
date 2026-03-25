@@ -660,7 +660,7 @@ function buildPrincessPlan(){
 /* ---------------- Solo Princess ---------------- */
 
 /* ========= SOLO PRINCESS – Toy Bias ========= */
-export function setToyBias(bias) {
+{
   SOLO_TOY_BIAS = bias;
   // optional: save to localStorage if you want it to persist
   localStorage.setItem("sc_soloBias", bias);
