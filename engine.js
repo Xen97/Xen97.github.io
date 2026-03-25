@@ -660,15 +660,14 @@ function buildPrincessPlan(){
 /* ---------------- Solo Princess ---------------- */
 
 /* ========= SOLO PRINCESS – Toy Bias ========= */
-{
+// SOLO_TOY_BIAS is imported from tasks.js — do NOT re-declare it here
+
+export function setToyBias(bias) {
   SOLO_TOY_BIAS = bias;
-  // optional: save to localStorage if you want it to persist
   localStorage.setItem("sc_soloBias", bias);
 }
 
-{
-  const base = { SUCKY: 5, WAND: 2, ZUMIO: 2 };
-
+export function getSoloWeights(phase) {
   if (SOLO_TOY_BIAS === "BALANCED") {
     return { SUCKY: 3, WAND: 3, ZUMIO: 2 };
   }
@@ -676,10 +675,9 @@ function buildPrincessPlan(){
     return { SUCKY: 2, WAND: 5, ZUMIO: 3 };
   }
   // default = SUCKY_HEAVY
-  return base;
+  return { SUCKY: 5, WAND: 2, ZUMIO: 2 };
 }
 
-// Replace the old SOLO_WEIGHTS and pickToyForPhase
 function pickToyForPhase(phase) {
   const weights = getSoloWeights(phase);
   const entries = Object.keys(weights).map(k => ({ item: k, w: weights[k] }));
