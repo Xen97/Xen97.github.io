@@ -54,6 +54,10 @@ function boot() {
   const normalized = (stored === "DOM" || stored === "PRINCESS" || stored === "PRINCESS_SOLO") ? stored : "PRINCESS";
   setMode(normalized);
 
+// Restore toy bias
+const savedBias = localStorage.getItem("sc_soloBias");
+if (savedBias) SOLO_TOY_BIAS = savedBias;
+  
   // Initial UI sync
   applyModeButtons();
   applyLengthButtons();
