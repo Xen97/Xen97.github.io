@@ -165,12 +165,25 @@ export function timesFor(mode, length){
 
 
 /* ========= chooser + tiny utils ========= */
-export function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-export function choice(arr){ return arr[randInt(0, arr.length-1)]; }
-export function maybeRest(range, prob){ return Math.random() < prob ? randInt(range[0], range[1]) : 0; }
+
+export function randInt(min,max){ 
+  return Math.floor(Math.random()*(max-min+1))+min; 
+}
+
+export function choice(arr){ 
+  return arr[randInt(0, arr.length-1)]; 
+}
+
+export function maybeRest(range, prob){ 
+  return Math.random() < prob ? randInt(range[0], range[1]) : 0; 
+}
 
 let usageCounts = {}, lastPick = {};
-export function resetChooser(){ usageCounts = {}; lastPick = {}; }
+export function resetChooser(){ 
+  usageCounts = {}; 
+  lastPick = {}; 
+}
+
 export function choiceLimitedFrom(poolKey, arr){
   if(!usageCounts[poolKey]) usageCounts[poolKey] = {};
   if(!lastPick[poolKey]) lastPick[poolKey] = null;
@@ -193,6 +206,7 @@ export function choiceLimitedFrom(poolKey, arr){
   usageCounts[poolKey][label] = (usageCounts[poolKey][label] || 0) + 1;
   lastPick[poolKey] = label;
   return fallback;
+}
   
   /* ========= SOLO PRINCESS – Toy Bias ========= */
   export let SOLO_TOY_BIAS = localStorage.getItem("sc_soloBias") || "SUCKY_HEAVY";
