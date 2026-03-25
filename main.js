@@ -63,19 +63,6 @@ function wireControls() {
   });
 }
 
-// Add these two functions (you can put them right before boot())
-export function applyToyBiasButtons() {
-  const b = SOLO_TOY_BIAS;
-  setPrimary(els.biasSuckyBtn,    b === "SUCKY_HEAVY");
-  setPrimary(els.biasBalancedBtn, b === "BALANCED");
-  setPrimary(els.biasWandBtn,     b === "WAND_HEAVY");
-}
-
-export function toggleToyBiasVisibility() {
-  const show = MODE === "PRINCESS" || MODE === "PRINCESS_SOLO";
-  if (els.toyBiasGroup) els.toyBiasGroup.style.display = show ? "flex" : "none";
-}
-
 // ---- boot ----
 function boot() {
   const stored = localStorage.getItem(LS_KEYS.MODE);
