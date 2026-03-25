@@ -1,4 +1,3 @@
-// ui.js
 export const $ = (s) => document.querySelector(s);
 
 export const els = {
@@ -14,14 +13,12 @@ export const els = {
   restartBtn: $("#restartBtn"),
   closeSummaryBtn: $("#closeSummaryBtn"),
   soloBtn: $("#soloBtn"),
-  
-export const els = {
-  ...existing...
+
+  // Toy bias
   toyBiasGroup: $("#toyBiasGroup"),
   biasSuckyBtn: $("#biasSuckyBtn"),
   biasBalancedBtn: $("#biasBalancedBtn"),
   biasWandBtn: $("#biasWandBtn"),
-};
 
   modeTag: $("#modeTag"),
   domBtn: $("#domBtn"),
@@ -51,10 +48,12 @@ export const els = {
 const ICONS = {
   info: "📝", phase: "🧭", task: "🎯", rest:"🌙", skip:"⏭️", pause:"⏸️", resume:"▶️", finisher:"🏁"
 };
+
 function ts() {
   const d = new Date();
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
 }
+
 export function log(msg, kind="info"){
   const line = document.createElement('div');
   const icon = ICONS[kind] || ICONS.info;
@@ -62,6 +61,7 @@ export function log(msg, kind="info"){
   els.log.appendChild(line);
   els.log.scrollTop = els.log.scrollHeight;
 }
+
 export function addDivider(label){
   const div = document.createElement('div');
   div.className = 'divider';
@@ -69,20 +69,21 @@ export function addDivider(label){
   els.log.appendChild(div);
   els.log.scrollTop = els.log.scrollHeight;
 }
+
 export function setPrimary(btn, on){
-  if (!btn) return;                              // null-safe
+  if (!btn) return;
   btn.classList.toggle("primary", !!on);
-  if (btn.classList.contains("ghost")) {         // remove ghost when active
+  if (btn.classList.contains("ghost")) {
     btn.classList.toggle("ghost", !on);
   }
   btn.setAttribute("aria-pressed", on ? "true" : "false");
 }
+
 export function setModeTag(mode){
   els.modeTag.textContent = mode === "DOM" ? "Dom Mode" : "Princess Mode";
 }
 
 export function mmss(s){
-  const m=Math.floor(s/60), sec=Math.max(0, Math.floor(s%60));
-  return String(m).padStart(2,'0')+":"+String(sec).padStart(2,'0');
+  const m = Math.floor(s/60), sec = Math.max(0, Math.floor(s%60));
+  return String(m).padStart(2,'0') + ":" + String(sec).padStart(2,'0');
 }
-
