@@ -171,7 +171,7 @@ export function applyModeButtons() {
 
   // Toy bias visibility (works for both Princess and Solo)
   toggleToyBiasVisibility();
-  if (MODE === "PRINCESS" || MODE === "PRINCESS_SOLO") {
+  if (MODE === "PRINCESS_SOLO") {
     applyToyBiasButtons();
   }
 }
