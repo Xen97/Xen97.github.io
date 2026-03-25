@@ -166,7 +166,8 @@ export function timesFor(mode, length){
 
 /* ========= chooser + tiny utils ========= */
 
-export function randInt(min,max){ 
+  export function randInt(min,max)
+  {
   return Math.floor(Math.random()*(max-min+1))+min; 
 }
 
