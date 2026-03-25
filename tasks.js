@@ -64,7 +64,7 @@ export const P_FINISH = [
   "sucky level 8",
   "sucky level 8 while fingering",
   "Vibrator level 3 while fingering",
-  "lick and suck clit whilewwwwwww fingering"
+  "lick and suck clit while fingering"
 ];
 
 /* ========= SOLO PRINCESS (no internal fingering) ========= */
