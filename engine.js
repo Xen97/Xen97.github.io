@@ -180,7 +180,7 @@ els.soloBtn.classList.toggle("ghost", MODE !== "PRINCESS_SOLO"); // <-- ensure n
     toggleToyBiasVisibility();
     document.documentElement.style.setProperty("--accent", "var(--accentPrincess)");
     document.documentElement.style.setProperty("--accentGlow", "rgba(230,102,102,.18)");
-  }
+
   localStorage.setItem(LS_KEYS.MODE, MODE);
 }
 
