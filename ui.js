@@ -14,7 +14,14 @@ export const els = {
   restartBtn: $("#restartBtn"),
   closeSummaryBtn: $("#closeSummaryBtn"),
   soloBtn: $("#soloBtn"),
-
+  
+export const els = {
+  ...existing...
+  toyBiasGroup: $("#toyBiasGroup"),
+  biasSuckyBtn: $("#biasSuckyBtn"),
+  biasBalancedBtn: $("#biasBalancedBtn"),
+  biasWandBtn: $("#biasWandBtn"),
+};
 
   modeTag: $("#modeTag"),
   domBtn: $("#domBtn"),
