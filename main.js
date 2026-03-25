@@ -10,11 +10,16 @@ import { setupEasterEgg } from "./easteregg.js";
 
 // ---- events wiring ----
 function wireControls() {
-  // Mode
+  // Mode buttons
   els.domBtn.addEventListener("click", () => { setMode("DOM"); applyModeButtons(); });
   els.princessBtn.addEventListener("click", () => { setMode("PRINCESS"); applyModeButtons(); });
   els.soloBtn.addEventListener("click", () => {
-    // Toy bias buttons
+    const next = (MODE === "PRINCESS_SOLO") ? "PRINCESS" : "PRINCESS_SOLO";
+    setMode(next);
+    applyModeButtons();
+  });
+
+  // Toy bias buttons (moved here – outside the soloBtn listener)
   els.biasSuckyBtn.addEventListener("click", () => {
     setToyBias("SUCKY_HEAVY");
     applyToyBiasButtons();
@@ -27,14 +32,10 @@ function wireControls() {
     setToyBias("WAND_HEAVY");
     applyToyBiasButtons();
   });
-    const next = (MODE === "PRINCESS_SOLO") ? "PRINCESS" : "PRINCESS_SOLO";
-    setMode(next);
-    applyModeButtons();
-  });
 
   // Length / sound
-  els.shortBtn.addEventListener("click", ()=> setLength("SHORT"));
-  els.longBtn.addEventListener("click",  ()=> setLength("LONG"));
+  els.shortBtn.addEventListener("click", () => setLength("SHORT"));
+  els.longBtn.addEventListener("click",  () => setLength("LONG"));
   els.soundBtn.addEventListener("click", toggleSound);
 
   // Transport
@@ -44,12 +45,12 @@ function wireControls() {
   els.finishBtn.addEventListener("click", finishNow);
 
   // Summary
-  els.closeSummaryBtn.addEventListener("click", ()=> els.overlay.classList.remove("show"));
-  els.restartBtn.addEventListener("click", ()=>{ els.overlay.classList.remove("show"); start(); });
-  els.saveLogBtn.addEventListener("click", ()=> import("./engine.js").then(m => m.saveLog && m.saveLog()));
+  els.closeSummaryBtn.addEventListener("click", () => els.overlay.classList.remove("show"));
+  els.restartBtn.addEventListener("click", () => { els.overlay.classList.remove("show"); start(); });
+  els.saveLogBtn.addEventListener("click", () => import("./engine.js").then(m => m.saveLog && m.saveLog()));
 
   // Keyboard
-  window.addEventListener("keydown", (e)=>{
+  window.addEventListener("keydown", (e) => {
     if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
     if (e.code === "Space") { e.preventDefault(); pause(); }
     else if (e.key.toLowerCase() === "s") start();
@@ -60,18 +61,31 @@ function wireControls() {
   });
 }
 
+// Add these two functions (you can put them right before boot())
+export function applyToyBiasButtons() {
+  const b = SOLO_TOY_BIAS;
+  setPrimary(els.biasSuckyBtn,    b === "SUCKY_HEAVY");
+  setPrimary(els.biasBalancedBtn, b === "BALANCED");
+  setPrimary(els.biasWandBtn,     b === "WAND_HEAVY");
+}
+
+export function toggleToyBiasVisibility() {
+  const show = MODE === "PRINCESS" || MODE === "PRINCESS_SOLO";
+  if (els.toyBiasGroup) els.toyBiasGroup.style.display = show ? "flex" : "none";
+}
+
 // ---- boot ----
 function boot() {
-  // Restore MODE from storage (normalize)
+  // Restore MODE
   const stored = localStorage.getItem(LS_KEYS.MODE);
   const normalized = (stored === "DOM" || stored === "PRINCESS" || stored === "PRINCESS_SOLO") ? stored : "PRINCESS";
   setMode(normalized);
 
-// Restore toy bias
-const savedBias = localStorage.getItem("sc_soloBias");
-if (savedBias) SOLO_TOY_BIAS = savedBias;
-  
-  // Initial UI sync
+  // Restore toy bias (SOLO_TOY_BIAS is exported from tasks.js)
+  const savedBias = localStorage.getItem("sc_soloBias");
+  if (savedBias) SOLO_TOY_BIAS = savedBias;   // this works because it's a live binding
+
+  // Initial UI
   applyModeButtons();
   applyLengthButtons();
   applySoundButton();
@@ -82,10 +96,8 @@ if (savedBias) SOLO_TOY_BIAS = savedBias;
   els.clock.textContent = "00:00";
   els.eta.textContent   = "~— left";
 
-  // Wire events and extras
   wireControls();
   setupEasterEgg(els.princessBtn);
 }
 
-// Only call boot once, when DOM is ready
 document.addEventListener("DOMContentLoaded", boot);
